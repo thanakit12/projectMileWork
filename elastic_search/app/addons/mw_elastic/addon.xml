@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>mw_elastic</id>
+    <name>Elastic Search</name>
+    <description>search products</description>
+    <version>1.0</version>
+    <priority>100500</priority>
+    <status>active</status>
+</addon>
