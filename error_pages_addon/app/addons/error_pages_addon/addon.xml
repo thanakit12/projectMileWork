@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>error_pages_addon</id>
+    <name>Edit Page 404 </name>
+    <description>edit page 404 to redirect home</description>
+    <version>1.0</version>
+    <priority>100500</priority>
+    <status>active</status>
+</addon>
