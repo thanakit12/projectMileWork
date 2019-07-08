@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if($mode == "view") {
 
+    // Variable name should be relevant and consistent. For example: $pro_id should be $product_id
     $pro_id = $_REQUEST["product_id"];
     $is_exists = fn_product_exists($pro_id);
     if($is_exists)

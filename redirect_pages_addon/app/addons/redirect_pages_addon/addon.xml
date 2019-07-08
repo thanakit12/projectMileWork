@@ -5,4 +5,5 @@
     <version>1.0</version>
     <priority>100500</priority>
     <status>active</status>
+    *Please add author: you can reference other addons .xml file
 </addon>
