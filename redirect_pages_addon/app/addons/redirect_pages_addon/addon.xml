@@ -5,5 +5,15 @@
     <version>1.0</version>
     <priority>100500</priority>
     <status>active</status>
-    *Please add author: you can reference other addons .xml file
+    <supplier>Thanakit</supplier>
+    <authors>
+        <author>
+            <name>THANAKIT</name>
+        </author>
+    </authors>
+    <compatibility>
+        <core_edition>
+            MULTIVENDOR
+        </core_edition>
+    </compatibility>
 </addon>
