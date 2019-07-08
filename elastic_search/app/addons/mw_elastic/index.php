@@ -21,4 +21,5 @@ $hosts = [
 
     if($client)
         echo "Success";
+    echo "test";
 ?>
