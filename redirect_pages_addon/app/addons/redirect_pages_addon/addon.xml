@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>redirect_pages_addon</id>
+    <description>Redirect Pages to home or categories</description>
+    <version>1.0</version>
+    <priority>100500</priority>
+    <status>active</status>
+</addon>
