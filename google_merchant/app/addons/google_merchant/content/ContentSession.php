@@ -241,7 +241,7 @@ class ContentSession {
       $this->merchantId, $this->merchantId);
     $this->websiteUrl = $account->getWebsiteUrl();
     if (is_null($this->websiteUrl)) {
-     // printf("No website listed for Merchant Center %d.\n", $this->merchantId);
+      printf("No website listed for Merchant Center %d.\n", $this->merchantId);
     } else {
 //      printf("Website for Merchant Center %d: %s\n",
 //          $this->merchantId, $this->websiteUrl);
@@ -322,13 +322,13 @@ class ContentSession {
 
   protected function cacheToken(Google_Client $client) {
     print (str_repeat('*', 40) . "\n");
-    print ("Your token was missing or invalid, fetching a new one\n");
+    //print ("Your token was missing or invalid, fetching a new one\n");
     $token = $this->getToken($client);
     $tokenFile = join(DIRECTORY_SEPARATOR,
         [$this->configDir, self::OAUTH_TOKEN_FILE_NAME]);
     file_put_contents($tokenFile, json_encode($token, JSON_PRETTY_PRINT));
-    printf("Token saved to %s\n", $tokenFile);
-    print (str_repeat('*', 40) . "\n");
+   // printf("Token saved to %s\n", $tokenFile);
+  //  print (str_repeat('*', 40) . "\n");
   }
 
   /**
@@ -344,7 +344,7 @@ class ContentSession {
           Google_Service_ShoppingContent::CONTENT);
       // If we got here, the credentials are there, so tell the client.
       $client->useApplicationDefaultCredentials();
-      print "Using Google Application Default Credentials.\n";
+   //   print "Using Google Application Default Credentials.\n";
     } catch (DomainException $exception) {
       // Safe to ignore this error, since we'll fall back on other creds unless
       // we are not using a configuration directory.
@@ -362,7 +362,7 @@ class ContentSession {
     $accountFile = join(DIRECTORY_SEPARATOR,
         [$this->configDir, self::SERVICE_ACCOUNT_FILE_NAME]);
     if (file_exists($accountFile)) {
-        print 'Loading service account credentials from ' . $accountFile . ".\n";
+     //   print 'Loading service account credentials from ' . $accountFile . ".\n";
       $client->setAuthConfig($accountFile);
       $client->setScopes(Google_Service_ShoppingContent::CONTENT);
       return;
@@ -370,13 +370,13 @@ class ContentSession {
     $oauthFile = join(DIRECTORY_SEPARATOR,
         [$this->configDir, self::OAUTH_CLIENT_FILE_NAME]);
     if (file_exists($oauthFile)) {
-      print 'Loading OAuth2 credentials from ' . $oauthFile . ".\n";
+      //print 'Loading OAuth2 credentials from ' . $oauthFile . ".\n";
       $client->setAuthConfig($oauthFile);
       $tokenFile = join(DIRECTORY_SEPARATOR,
           [$this->configDir, self::OAUTH_TOKEN_FILE_NAME]);
       $token = null;
       if (file_exists($tokenFile)) {
-        printf("Loading stored token from '%s'.\n", $tokenFile);
+      //  printf("Loading stored token from '%s'.\n", $tokenFile);
         $token = json_decode(file_get_contents($tokenFile), true);
       }
       if (is_null($token) || !array_key_exists('refresh_token', $token)) {
@@ -384,7 +384,7 @@ class ContentSession {
       } else {
         try {
           $client->refreshToken($token['refresh_token']);
-          printf("Successfully loaded token from '%s'.\n", $tokenFile);
+         // printf("Successfully loaded token from '%s'.\n", $tokenFile);
         } catch (Google_Auth_Exception $exception) {
           $this->cacheToken($client);
         }
@@ -407,8 +407,8 @@ class ContentSession {
         return call_user_func([$object, $function], $parameter);
       } catch (Google_Service_Exception $exception) {
         $sleepTime = $attempts * $attempts;
-        printf("Attempt to call %s failed, retrying in %d second(s).\n",
-            $function, $sleepTime);
+//        printf("Attempt to call %s failed, retrying in %d second(s).\n",
+//            $function, $sleepTime);
         sleep($sleepTime);
         $attempts++;
       }
