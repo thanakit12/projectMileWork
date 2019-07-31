@@ -17,7 +17,6 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
             $product = fn_google_merchant_create($product_id, $product_data);
             $result = fn_google_merchant_insert($product);
         } else {
-            //when click product
             //  if check has one product and edit some thing then save
             // else one product click change status in products.manage then pass parameter to functions
             if (isset($_REQUEST['product_id']) && !isset($_REQUEST['product_ids']))
