@@ -17,8 +17,13 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
             $product = fn_google_merchant_create($product_id, $product_data);
             $result = fn_google_merchant_insert($product);
         } else {
+            //when click product
+            //  if check has one product and edit some thing then save
+            // else one product click change status in products.manage then pass parameter to functions
             if (isset($_REQUEST['product_id']) && !isset($_REQUEST['product_ids']))
             {
+                //A - Active
+                //D - Disable
                 if($product_status == 'A')
                 {
                     $product = fn_google_merchant_create($product_id,$product_data);
@@ -42,6 +47,7 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
     }
 }
 
+//This Function is cut html elements
 function fn_rip_tags($string)
 {
     // ----- remove HTML TAGs -----
@@ -106,7 +112,6 @@ function fn_google_merchant_insertBatch($products)
 
         $p[] = $product;
     }
-    //fn_print_die($p);
     $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
     $batchRequest->setEntries($p);
     $batchResponse = $product_data->session->service->products->custombatch($batchRequest);
@@ -119,7 +124,6 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
 
     $data_product = fn_google_merchant_prepare_product($collect_data);
     fn_google_merchant_insertBatch($data_product);
-//    fn_print_die("success");
 }
 
 function fn_google_merchant_collect_data($import_data)
@@ -155,12 +159,14 @@ function fn_google_merchant_prepare_product($collect_data)
 }
 
 //Hook
-//This section is insert or delete product to google merchant when click tool.updates_status
+
 function fn_google_merchant_tools_change_status($params, $result)
 {
     $auth = $_SESSION["auth"];
     $status = $params['status'];
     $products = [];
+
+    //This section is insert or delete one product to google merchant when click tool.updates_status on products.manage page
     if(isset($params['dispatch'])) {
         try {
             $product_id = $_REQUEST['id'];
@@ -177,6 +183,7 @@ function fn_google_merchant_tools_change_status($params, $result)
             fn_set_notification('E', __('error'), _('This product does not in google merchant center'));
         }
     }
+    //if have many products select and change status
     elseif (isset($_REQUEST['product_ids']))
     {
         $product_id = $_REQUEST['product_ids'];
@@ -201,7 +208,6 @@ function fn_google_merchant_tools_change_status($params, $result)
         }
     }
 }
-
 
     function fn_google_merchant_create($product_id, $product_data)
     {
