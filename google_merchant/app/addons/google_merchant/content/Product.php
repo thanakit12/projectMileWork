@@ -41,19 +41,18 @@ class Product extends BaseSample
         }
     }
 
+    public function deleteProduct($offerId)
+    {
+        $productId = $this->buildProductId($offerId);
+        // The response for a successful delete is empty
+        $this->session->service->products->delete($this->session->merchantId, $productId);
+    }
+
     private function buildProductId($offer_id)
     {
         return sprintf('%s:%s:%s:%s', self::CHANNEL, self::CONTENT_LANGUAGE,
             self::TARGET_COUNTRY, $offer_id);
     }
-
-    public function deleteProduct($offerId)
-    {
-        $productId = $this->buildProductId($offerId);
-        // The response for a successful delete is empty
-     $this->session->service->products->delete($this->session->merchantId, $productId);
-    }
-
 
     public function createProduct($product_id, $product_data)
     {
@@ -64,7 +63,7 @@ class Product extends BaseSample
         $product_name = $product_data["product"];
         $product_price = $product_data["price"];
 
-        if(isset($product["brand"]))
+        if (isset($product["brand"]))
             $brand = $product_data["brand"];
         else
             $brand = 'test';
@@ -93,75 +92,24 @@ class Product extends BaseSample
         $product->setChannel('online');
         $product->setIncludedDestinations(["Shopping Ads"]);
 
-       return $product;
-//  }
+        return $product;
+    }
+
+    public function DeleteBatch($products)
+    {
+        $p = [];
+        foreach ($products as $key => $offerId) {
+            $entry =
+                new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
+            $entry->setMethod('delete');
+            $entry->setBatchId($key);
+            $entry->setProductId($this->buildProductId($offerId));
+            $entry->setMerchantId($this->session->merchantId);
+            $p[] = $entry;
+        }
+        $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+        $batchRequest->setEntries($p);
+        $batchResponses = $this->session->service->products->custombatch($batchRequest);
     }
 }
 
-
-//  public function updateProduct(
-//      Google_Service_ShoppingContent_Product $product) {
-//    // Let's fix the warning about product_type and update the product
-//    $product->setProductType('English/Classics');
-//    // Notice that we use insert. The products service does not have an update
-//    // method. Inserting a product with an ID that already exists means the same
-//    // as doing an update anyway.
-//
-//    $response = $this->session->service->products->insert(
-//        $this->session->merchantId, $product);
-//
-////    // We should no longer get the product_type warning.
-////    $warnings = $response->getWarnings();
-////    printf("Product updated, there are now %d warnings\n", count($warnings));
-////    foreach($warnings as $warning) {
-////      printf(" [%s] %s\n", $warning->getReason(), $warning->getMessage());
-////    }
-//  }
-
-//  public function insertProduct(
-//      Google_Service_ShoppingContent_Product $product) {
-//     $response = $this->session->service->products->insert(
-//        $this->session->merchantId, $product);
-//  }
-//  public function getProduct($offerId) {
-//    $productId = $this->buildProductId($offerId);
-//    $product = $this->session->service->products->get(
-//        $this->session->merchantId, $productId);
-//    printf("Retrieved product %s: '%s'\n", $product->getId(),
-//        $product->getTitle());
-//  }
-//public function insertProductBatch($products) {
-//    $entries = [];
-//
-//    foreach ($products as $key => $product) {
-//      $entry = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
-//      $entry->setMethod('insert');
-//      $entry->setBatchId($key);
-//      $entry->setProduct($product);
-//      $entry->setMerchantId($this->session->merchantId);
-//
-//      $entries[] = $entry;
-//    }
-//
-//    $batchRequest =
-//        new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-//    $batchRequest->setEntries($entries);
-//
-//    $batchResponse =
-//        $this->session->service->products->custombatch($batchRequest);
-//
-//    printf("Inserted %d products.\n", count($batchResponse->entries));
-//
-//    foreach ($batchResponse->entries as $entry) {
-//      if (empty($entry->getErrors())) {
-//        $product = $entry->getProduct();
-//        printf("Inserted product %s with %d warnings\n", $product->getOfferId(),
-//            count($product->getWarnings()));
-//      } else {
-//        print ("There were errors inserting a product:\n");
-//        foreach ($entry->getErrors()->getErrors() as $error) {
-//          printf("\t%s\n", $error->getMessage());
-//        }
-//      }
-//    }
-//  }

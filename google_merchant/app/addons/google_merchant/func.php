@@ -170,24 +170,6 @@ function fn_google_merchant_tools_change_status($params, $result)
             fn_set_notification('E', __('error'), _('This product does not in google merchant center'));
         }
     } //if have many products select and change status
-    elseif (isset($_REQUEST['product_ids'])) {
-        $product_id = $_REQUEST['product_ids'];
-        $data = [];
-        $mode = $_REQUEST['dispatch'];
-        if ($mode == "products.m_activate") {
-            for ($i = 0; $i < count($product_id); $i++) {
-                $data[] = fn_get_product_data($product_id[$i], $auth, 'th', '', true, true, true, true, false, false, '');
-                $product = fn_google_merchant_create($product_id[$i], $data[$i]);
-                $products[] = $product;
-            }
-            $arr = array_unique($products, SORT_REGULAR);
-            fn_google_merchant_insertBatch($arr);
-        } else if ($mode == "products.m_disable") {
-            for ($i = 0; $i < count($product_id); $i++) {
-                fn_google_merchant_delete($product_id[$i]);
-            }
-        }
-    }
 }
 
 function fn_google_merchant_create($product_id, $product_data)
@@ -235,4 +217,9 @@ function fn_google_merchant_create($product_id, $product_data)
     return $product;
 }
 
+function fn_google_merchant_deleteBatch($product_id)
+{
+    $product = new Product();
+    $product->DeleteBatch($product_id);
+}
 
