@@ -177,12 +177,11 @@ function fn_google_merchant_tools_change_status($params, $result)
         if ($mode == "products.m_activate") {
             for ($i = 0; $i < count($product_id); $i++) {
                 $data[] = fn_get_product_data($product_id[$i], $auth, 'th', '', true, true, true, true, false, false, '');
-                $product = fn_google_merchant_create($product_id[$i], $data[$i]);
+                $product[] = fn_google_merchant_create($product_id[$i], $data[$i]);
                 $products[] = $product;
             }
             $arr = array_unique($products, SORT_REGULAR);
             fn_google_merchant_insertBatch($arr);
-            fn_redirect('products.manage');
         } else if ($mode == "products.m_disable") {
             for ($i = 0; $i < count($product_id); $i++) {
                 fn_google_merchant_delete($product_id[$i]);
