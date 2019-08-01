@@ -5,19 +5,20 @@
     <priority>100500</priority>
     <status>active</status>
     <settings>
-    <sections>
-    <section id="general">
-        <items>
-            <item id="path">
-                <name>This path is intalled config file
-                    (if you want to change this config file, you put new config file in path)
-                </name>
-                <type>input</type>
-                <default_value>var/files/google_merchant/content</default_value>
-            </item>
-        </items>
-    </section>
-    </sections>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="setting_addon">
+                        <name>การติดตั้งไฟล์ config google_merchant addon</name>
+                        <type>header</type>
+                    </item>
+                    <item id="description">
+                        <type>template</type>
+                        <default_value>description.tpl</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
     </settings>
     <supplier>Thanakit</supplier>
     <authors>
