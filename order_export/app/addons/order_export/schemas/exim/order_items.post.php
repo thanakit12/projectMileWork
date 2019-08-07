@@ -54,7 +54,7 @@ $schema['export_fields']['User ID'] = array(
 
 $schema['export_fields']['Category'] = array(
     'db_field' => 'product_id',
-    'process_get' => array('fn_exim_get_product_categories','#this','M','///', '#lang_code'),
+    'process_get' => array('fn_exim_get_product_categories', '#this', 'M', '///', '#lang_code'),
 //    'multilang' => true,
 //    'linked' => false,
 );
