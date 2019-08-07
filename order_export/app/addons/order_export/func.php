@@ -49,6 +49,7 @@ function fn_order_export_order_history($order_id)
     $time = '';
     $result = fn_get_order_history($params, 0);
     $j = 0;
+
     for ($i = 0; $i < count($result); $i++) {
         $response = $result[$i][$j]["content"]["status_to"];
         if ($response == 'C') {
@@ -56,26 +57,25 @@ function fn_order_export_order_history($order_id)
         }
         $j++;
     }
-
     $finish_date = fn_order_export_timestamp_to_date($time);
 
     return $finish_date;
 }
 
-function fn_generateCsv($data, $delimiter = ',', $enclosure = '"')
-{
-    $contents = '';
-    $handle = fopen('php://temp', 'r+');
-    foreach ($data as $line) {
-        fputcsv($handle, $line, $delimiter, $enclosure);
-    }
-    rewind($handle);
-    while (!feof($handle)) {
-        $contents .= fread($handle, 8192);
-    }
-    fclose($handle);
-    return $contents;
-}
+//function fn_generateCsv($data, $delimiter = ',', $enclosure = '"')
+//{
+//    $contents = '';
+//    $handle = fopen('php://temp', 'r+');
+//    foreach ($data as $line) {
+//        fputcsv($handle, $line, $delimiter, $enclosure);
+//    }
+//    rewind($handle);
+//    while (!feof($handle)) {
+//        $contents .= fread($handle, 8192);
+//    }
+//    fclose($handle);
+//    return $contents;
+//}
 
 function fn_order_export_shipment_method($order_id)
 {
@@ -85,3 +85,4 @@ function fn_order_export_shipment_method($order_id)
 
     return $query['shipping'];
 }
+
