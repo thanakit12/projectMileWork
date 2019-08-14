@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<addon scheme="2.0">
-    <id>order_format_addon</id>
-    <name>Order_FORMAT_Add-on</name>
-    <description>change position name surname in correct positions</description>
-    <version>1.0</version>
-    <priority>100500</priority>
-    <status>active</status>
-</addon>
