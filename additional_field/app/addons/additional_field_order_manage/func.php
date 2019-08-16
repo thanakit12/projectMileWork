@@ -25,8 +25,7 @@ function fn_additional_field_order_manage_getGroup($user_id)
 
 function fn_additional_field_order_manage_get_orders_post($params, &$orders)
 {
-    foreach ($orders as &$o)
-    {
+    foreach ($orders as &$o) {
         $user_id = $o['user_id'];
         $group_name = db_get_row("SELECT usergroup FROM ?:usergroup_links
                                   INNER JOIN
@@ -41,7 +40,7 @@ function fn_additional_field_order_manage_get_orders_post($params, &$orders)
                                  AND
                                   ?:usergroup_descriptions.lang_code = 'th'
                                  AND
-                                 ?:usergroup_links.status = 'A'",$user_id);
+                                 ?:usergroup_links.status = 'A'", $user_id);
         $o['usergroup'] = $group_name;
     }
 }
@@ -62,8 +61,7 @@ function fn_additional_field_order_manage_getGroupByOrder($order_id)
                          AND
                          ?:usergroup_links.status = 'A'
                          AND
-                         ?:usergroup_descriptions.lang_code = 'th'",$order_id);
-
+                         ?:usergroup_descriptions.lang_code = 'th'", $order_id);
     return $query['usergroup'];
 
 }
