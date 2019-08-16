@@ -4,7 +4,6 @@ if (!defined('AREA')) {
     die('Access denied');
 }
 
-
 function fn_additional_field_order_manage_getGroup($user_id)
 {
     $query = db_get_row("SELECT usergroup FROM ?:usergroup_links
@@ -59,7 +58,9 @@ function fn_additional_field_order_manage_getGroupByOrder($order_id)
                          ON
                          ?:usergroup_links.usergroup_id = ?:usergroup_descriptions.usergroup_id
                          WHERE
-                         order_id = ?i
+                         order_id = ?i 
+                         AND
+                         ?:usergroup_links.status = 'A'
                          AND
                          ?:usergroup_descriptions.lang_code = 'th'",$order_id);
 
