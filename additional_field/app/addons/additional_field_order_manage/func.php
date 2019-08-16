@@ -23,6 +23,7 @@ function fn_additional_field_order_manage_getGroup($user_id)
     return $query['usergroup'];
 }
 
+//This function assign usergroup data to order page
 function fn_additional_field_order_manage_get_orders_post($params, &$orders)
 {
     foreach ($orders as &$o) {
