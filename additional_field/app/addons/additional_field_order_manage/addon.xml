@@ -3,7 +3,7 @@
     <id>additional_field_order_manage</id>
     <name>Additional Field Order Page</name>
     <description>This Addon show field addtional in order manage page(if you want to add field in order manage page you can modify in this addon)</description>
-    <version>1.0</version>
+    <version>1.0.2</version>
     <priority>100502</priority>
     <status>active</status>
     <supplier>Thanakit</supplier>
