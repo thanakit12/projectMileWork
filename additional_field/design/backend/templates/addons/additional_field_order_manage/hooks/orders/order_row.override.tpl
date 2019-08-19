@@ -40,6 +40,7 @@
     <td class="nowrap" data-th="{__("date")}">{$o.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
     <td data-th="{__("customer")}">
         {if $o.email}<a href="mailto:{$o.email|escape:url}">@</a> {/if}
+{*Add field usergroup behind firstname and lastname*}
         {if $o.user_id}<a href="{"profiles.update?user_id=`$o.user_id`"|fn_url}">{/if}{$o.firstname} {$o.lastname} {_("(")}{$o.usergroup['usergroup']}{_(")")}{if $o.user_id}</a>{/if}
         {if $o.company}<p class="muted">{$o.company}</p>{/if}
     </td>
