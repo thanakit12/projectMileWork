@@ -41,8 +41,7 @@ function fn_additional_field_order_manage_get_orders_post($params, &$orders)
     }
 }
 
-function
-fn_additional_field_order_manage_get_newPhone($order_id)
+function fn_additional_field_order_manage_get_newPhone($order_id)
 {
     $query = db_get_row("SELECT value FROM ?:profile_fields_data
                          INNER JOIN
@@ -95,26 +94,94 @@ function fn_additional_field_order_manage_getGroupByOrder($order_id)
     return $query['usergroup'];
 }
 
-function fn_additional_field_order_manage_exportPhone($order_id)
+function fn_additional_field_order_manage_exportPhone($order_id, $type)
 {
-    $order = fn_get_order_info($order_id);
-    $result = fn_additional_field_order_manage_get_newPhone($order_id);
-    if (!empty($result)) {
-        $response = $result['value'];
-    } else {
-        $response = $order['phone'];
-    }
-    return $response;
+    $query = db_get_row("select value FROM ?:profile_fields_data
+                         INNER JOIN
+                         ?:profile_fields
+                         ON
+                         ?:profile_fields_data.field_id = ?:profile_fields.field_id
+                         WHERE
+                         object_id = ?i
+                         AND
+                         ?:profile_fields.section = ?s
+                         AND 
+                         ?:profile_fields.class = 'shipping-new-phone'", $order_id, $type);
+    return $query['value'];
 }
 
 
-function fn_additional_field_order_manage_importPhone($data,$order_id)
-{
-//    $order = fn_get_order_info($order_id);
-//    if (!isset($order['phone'])) {
-//        db_query("UPDATE ?:profile_fields_data SET value = '$data' WHERE object_id = ?i",$order_id);
-//    } else {
-//        db_query("UPDATE ?:orders SET phone = '$data' where order_id = ?i",$order_id);
-//    }
+if (!function_exists('fn_additional_field_order_manage_clean_data')) {
+    function fn_additional_field_order_manage_clean_data()
+    {
+        $html = '';
+        $html .= '<button type="submit" name="dispatch[additional_field_order_manage.clean]">click to clean data here</button>';
+        return $html;
+    }
+}
 
+if (!function_exists('fn_additional_field_order_manage_clean_phone_format')) {
+    function fn_additional_field_order_manage_clean_phone_format()
+    {
+        $html = '';
+        $html .= '<br/><button type="submit" name="dispatch[additional_field_order_manage.clean_phone]">click to clean phone format</button>';
+        return $html;
+    }
+}
+
+function fn_additional_field_order_manage_exportPhoneSecond($order_id,$type)
+{
+    $query = db_get_row("select value FROM ?:profile_fields_data
+                         INNER JOIN
+                         ?:profile_fields
+                         ON
+                         ?:profile_fields_data.field_id = ?:profile_fields.field_id
+                         WHERE
+                         object_id = ?i
+                         AND
+                         ?:profile_fields.section = ?s
+                         AND 
+                         ?:profile_fields.class = 'shipping-phone-two'", $order_id, $type);
+    return $query['value'];
+}
+
+function fn_formatPhoneNumber($phoneNumber)
+{
+    $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
+    if (strlen($phoneNumber) > 10) {
+        $phoneNumber = 'xxx-xxx-xxxx';
+    } else if (strlen($phoneNumber) == 10) {
+        $areaCode = substr($phoneNumber, 0, 3);
+        $nextThree = substr($phoneNumber, 3, 3);
+        $lastFour = substr($phoneNumber, 6, 4);
+
+        $phoneNumber = '' . $areaCode . '-' . $nextThree . '-' . $lastFour;
+    } else if (strlen($phoneNumber) == 7) {
+        $nextThree = substr($phoneNumber, 0, 3);
+        $lastFour = substr($phoneNumber, 3, 4);
+        $phoneNumber = $nextThree . '-' . $lastFour;
+    } else {
+        $phoneNumber = '';
+    }
+    return $phoneNumber;
+}
+
+function fn_additional_field_order_manage_importPhone($data,$order_id,$type)
+{
+    $field_id = '';
+    if($type == 'S')
+    {
+        $field_id = db_get_row("SELECT field_id FROM ?:profile_fields where class = 'shipping-new-phone'");
+    }
+    else if ($type == 'B')
+    {
+        $field_id = db_get_row("SELECT field_id FROM ?:profile_fields where class = 'billing-new-phone'");
+    }
+    $f_id = $field_id['field_id'];
+    db_query("UPDATE 
+            ?:profile_fields_data 
+            SET `value` = ?s 
+            WHERE `?:profile_fields_data`.`object_id` = ?i 
+            AND `?:profile_fields_data`.`object_type` = 'O' 
+            AND `?:profile_fields_data`.`field_id` = ?i",$data,$order_id,$f_id);
 }

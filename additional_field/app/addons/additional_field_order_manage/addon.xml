@@ -12,6 +12,22 @@
             <name>thanakit</name>
         </author>
     </authors>
+    <settings edition_type="ROOT">
+        <sections>
+            <section id="clean_data">
+                <items>
+                    <item id="clean_data_info">
+                        <type>info</type>
+                        <handler>fn_additional_field_order_manage_clean_data</handler>
+                    </item>
+                    <item id="clean_phone_format">
+                        <type>info</type>
+                        <handler>fn_additional_field_order_manage_clean_phone_format</handler>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
     <compatibility>
         <core_edition>
             MULTIVENDOR
