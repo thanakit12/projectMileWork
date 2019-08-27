@@ -34,14 +34,15 @@ function fn_additional_field_order_manage_get_orders_post($params, &$orders)
         if (!empty($group_name)) {
             $o['usergroup'] = $group_name['usergroup'];
         }
-        $new_phone = fn_additional_field_order_manage_get_newPhone($order_id);
+        $new_phone = fn_additional_field_order_manage_get_PhoneFormatted($order_id);
         if (!empty($new_phone) > 0) {
             $o['phone'] = $new_phone['value'];
         }
     }
 }
 
-function fn_additional_field_order_manage_get_newPhone($order_id)
+// This Function return Shipping phone formatted,phone formatted form is xxx-xxx-xxxx.
+function fn_additional_field_order_manage_get_PhoneFormatted($order_id)
 {
     $query = db_get_row("SELECT value FROM ?:profile_fields_data
                          INNER JOIN
@@ -51,7 +52,8 @@ function fn_additional_field_order_manage_get_newPhone($order_id)
                          WHERE
                          object_id = ?i
                          AND
-                         ?:profile_fields.section = 'S'", $order_id);
+                         ?:profile_fields.section = 'S'
+                         AND ?:profile_fields.class = 'shipping-new-phone'", $order_id);
     return !empty($query) ? $query : '';
 }
 
@@ -94,7 +96,7 @@ function fn_additional_field_order_manage_getGroupByOrder($order_id)
     return $query['usergroup'];
 }
 
-function fn_additional_field_order_manage_exportPhone($order_id, $type)
+function fn_additional_field_order_manage_exportPhoneFormatted($order_id, $type,$class)
 {
     $query = db_get_row("select value FROM ?:profile_fields_data
                          INNER JOIN
@@ -106,7 +108,7 @@ function fn_additional_field_order_manage_exportPhone($order_id, $type)
                          AND
                          ?:profile_fields.section = ?s
                          AND 
-                         ?:profile_fields.class = 'shipping-new-phone'", $order_id, $type);
+                         ?:profile_fields.class = ?s", $order_id, $type,$class);
     return $query['value'];
 }
 
@@ -129,7 +131,7 @@ if (!function_exists('fn_additional_field_order_manage_clean_phone_format')) {
     }
 }
 
-function fn_additional_field_order_manage_exportPhoneSecond($order_id,$type)
+function fn_additional_field_order_manage_exportReservePhone($order_id,$type,$class)
 {
     $query = db_get_row("select value FROM ?:profile_fields_data
                          INNER JOIN
@@ -141,7 +143,7 @@ function fn_additional_field_order_manage_exportPhoneSecond($order_id,$type)
                          AND
                          ?:profile_fields.section = ?s
                          AND 
-                         ?:profile_fields.class = 'shipping-phone-two'", $order_id, $type);
+                         ?:profile_fields.class = ?s", $order_id, $type,$class);
     return $query['value'];
 }
 
@@ -166,7 +168,7 @@ function fn_formatPhoneNumber($phoneNumber)
     return $phoneNumber;
 }
 
-function fn_additional_field_order_manage_importPhone($data,$order_id,$type)
+function fn_additional_field_order_manage_importPhoneFormatted($data,$order_id,$type)
 {
     $field_id = '';
     if($type == 'S')

@@ -10,7 +10,10 @@
                     <div class="control-group">
                 {/if}
                 {assign var="first_field" value=false}
+                {*  Comment additional field description from original*}
+                {*  <label>{$field.description}:</label>*}
                 {$value}
+
                 {if $customer_info}
                     </span>
                 {else}
@@ -20,4 +23,3 @@
         {/if}
     {/foreach}
 </p>
-{debug}

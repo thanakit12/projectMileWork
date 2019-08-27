@@ -14,9 +14,10 @@
         {/if}
         {if $user_data.s_country_descr}<p>{$user_data.s_country_descr}</p>{/if}
         {include file="views/profiles/components/profile_fields_info.tpl" fields=$profile_fields.S}
-{*        {if $user_data.s_phone}*}
-{*            <a href="tel:{$user_data.s_phone}"><bdi>{$user_data.s_phone}</bdi></a>*}
-{*        {/if}*}
+        {* Comment shipping phone from original*}
+        {*        {if $user_data.s_phone}*}
+        {*            <a href="tel:{$user_data.s_phone}"><bdi>{$user_data.s_phone}</bdi></a>*}
+        {*        {/if}*}
         {if $user_data.s_address_type}
             <p>{__("address_type")}: {$user_data.s_address_type}</p>
         {/if}

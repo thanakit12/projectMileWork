@@ -4,6 +4,8 @@ if (!defined('BOOTSTRAP')) {
 }
 
 if ($mode == 'clean') {
+    //This Action move user profile to profile_fields_data in database. Then this action clean user_profile phone incorrect format
+    //to formatted phone show in order.detail and user.details
     db_query("DELETE FROM ?:profile_fields_data where object_type = 'P' || object_type = 'S'");
     $query = db_get_array("select profile_id from ?:user_profiles");
 
@@ -26,6 +28,7 @@ if ($mode == 'clean') {
         $query_bill_phone_main = db_get_row("select b_phone from ?:user_profiles where profile_id = ?i and profile_type = 'P'", $profile_id);
 
         if (!empty($query_ship_phone_second) || !empty($query_bill_phone_second)) {
+
             $ship_phone_second = $query_ship_phone_second['s_phone'];
             $bill_phone_second = $query_bill_phone_second['b_phone'];
 
@@ -33,8 +36,8 @@ if ($mode == 'clean') {
             $bill_phone_second = fn_formatPhoneNumber($bill_phone_second);
 
             db_query("INSERT INTO `?:profile_fields_data` (`object_id`, `object_type`, `field_id`, `value`)
-               values ('$profile_id','S','$field_shipping_phone','$ship_phone_second'),
-                      ('$profile_id','S','$field_billing','$bill_phone_second')");
+               values ('$profile_id','P','$field_shipping_phone','$ship_phone_second'),
+                      ('$profile_id','P','$field_billing','$bill_phone_second')");
 
         }
         if (!empty($query_ship_phone_main) || !empty($query_bill_phone_main)) {
@@ -58,7 +61,7 @@ if ($mode == 'clean') {
     fn_set_notification("N", "Clean", "Data is Finished");
 
 } else if ($mode == 'clean_phone') {
-
+    //This Action clean format phone incorrect to formatted phone(xxx-xxx-xxxx) in order.manage page
     db_query("DELETE from ?:profile_fields_data where object_type = 'O'");
     $order_all = db_get_array("select order_id from ?:orders");
 

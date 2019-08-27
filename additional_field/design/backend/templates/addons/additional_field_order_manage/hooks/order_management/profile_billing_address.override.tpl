@@ -1,4 +1,3 @@
-
 {if !fn_is_empty($user_data)}
     {if $profile_fields.B}
         {if $user_data.b_firstname || $user_data.b_lastname}
@@ -15,9 +14,10 @@
         {/if}
         {if $user_data.b_country_descr}<p>{$user_data.b_country_descr}</p>{/if}
         {include file="views/profiles/components/profile_fields_info.tpl" fields=$profile_fields.B}
-{*        {if $user_data.b_phone}*}
-{*            <a href="tel:{$user_data.b_phone}"><bdi>{$user_data.b_phone}</bdi></a>*}
-{*        {/if}*}
+        {* Comment  billing phone out from original*}
+        {*        {if $user_data.b_phone}*}
+        {*            <a href="tel:{$user_data.b_phone}"><bdi>{$user_data.b_phone}</bdi></a>*}
+        {*        {/if}*}
     {else}
         <p class="muted">{__("no_data")}</p>
     {/if}
