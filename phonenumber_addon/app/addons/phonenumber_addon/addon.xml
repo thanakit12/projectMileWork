@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<addon scheme="2.0">
-    <id>phonenumber_addon</id>
-    <name>Phone_Format_addon</name>
-    <description>format phone in frontend</description>
-    <version>1.0</version>
-    <priority>100500</priority>
-    <status>active</status>
-</addon>

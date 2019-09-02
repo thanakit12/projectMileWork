@@ -2,7 +2,9 @@
 <addon scheme="2.0">
     <id>additional_field_order_manage</id>
     <name>Additional Field Order Page</name>
-    <description>This Addon show field addtional in order manage page(if you want to add field in order manage page you can modify in this addon)</description>
+    <description>This Addon show field addtional in order manage page(if you want to add field in order manage page you
+        can modify in this addon)
+    </description>
     <version>1.0.2</version>
     <priority>100502</priority>
     <status>active</status>
@@ -20,6 +22,10 @@
                         <type>info</type>
                         <handler>fn_additional_field_order_manage_clean_data</handler>
                     </item>
+                </items>
+            </section>
+            <section id="clean_phone_format_in_order_page">
+                <items>
                     <item id="clean_phone_format">
                         <type>info</type>
                         <handler>fn_additional_field_order_manage_clean_phone_format</handler>
