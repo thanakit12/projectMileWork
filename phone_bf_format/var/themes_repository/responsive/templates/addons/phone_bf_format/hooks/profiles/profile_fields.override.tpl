@@ -90,19 +90,23 @@
     {elseif $field.field_type == "ProfileFieldTypes::VENDOR_TERMS"|enum}
 
         {include file="views/profiles/components/vendor_terms.tpl"}
-
     {elseif $field.field_type == "ProfileFieldTypes::PHONE"|enum}
-        <input {if $field.field_type == "P"} data-inputmask="'mask': '999-999-9999'"
-                {/if}{if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} type="text"
-                id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" size="32" value="{$value}"
-                class="ty-input-text {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {if $smarty.foreach.profile_fields.index == 0} cm-focus{/if}" {if !$skip_field}{$disabled_param nofilter}{/if} />
-    {else}  {* Simple input *}
-        <input {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} type="text"
-               id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" size="32" value="{$value}"
-               class="ty-input-text {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {if $smarty.foreach.profile_fields.index == 0} cm-focus{/if}" {if !$skip_field}{$disabled_param nofilter}{/if} />
+        <input
+                {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if}
+                type="text"
+                id="{$id_prefix}elm_{$field.field_id}"
+                name="{$data_name}[{$data_id}]"
+                size="32"
+                value="{$value}"
+                maxlength="10"
+                onchange="validate(this)"
+                class="ty-phone {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {if $smarty.foreach.profile_fields.index == 0} cm-focus{/if}" {if !$skip_field}{$disabled_param nofilter}{/if} />
+
+
+    {else}  {* Simple input Check type if type = phone change format phone to xxx-xxx-xxxx *}
+        <input type="text" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" size="32"
+               value="{$value}" class="input-large" {$disabled_param nofilter} />
     {/if}
     {assign var="pref_field_name" value=$field.description}
 </div>
-<script>
-        $(":input").inputmask();
-</script>
+{script src="js/addons/additional_field_order_manage/func.js"}

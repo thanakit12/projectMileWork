@@ -21,6 +21,8 @@
 {script src="js/tygh/history.js"}
 {script src="js/lib/autonumeric/autoNumeric.js"}
 {script src="js/lib/appear/jquery.appear-1.1.1.js"}
+{*{script src = "js/addons/additional_field_order_manage/func.js"}*}
+    {* Add script jquery.inputmask.min.js in line below *}
 {script src="js/lib/inputmask/jquery.inputmask.min.js"}
 
 {if !$runtime.customization_mode.live_editor}
@@ -37,9 +39,8 @@
     {script src="js/lib/autosize/jquery.autosize.js"}
     {script src="js/tygh/live_editor_mode.js"}
 {/if}
-
     <script type="text/javascript">
-        (function(_, $) {
+        (function (_, $) {
 
             _.tr({
                 cannot_buy: '{__("cannot_buy")|escape:"javascript"}',
@@ -121,7 +122,7 @@
 
             {if !$smarty.request.init_context}
 
-            $(document).ready(function(){
+            $(document).ready(function () {
                 $.runCart('C');
             });
 
@@ -131,20 +132,16 @@
             // CSRF form protection key
             _.security_hash = '{""|fn_generate_security_hash}';
             {/if}
+
         }(Tygh, Tygh.$));
     </script>
-
 {script src="js/lib/inputmask/jquery.inputmask.min.js"}
 {script src="js/lib/jquery-bind-first/jquery.bind-first-0.2.3.js"}
 {script src="js/lib/inputmask-multi/jquery.inputmask-multi.js"}
 {script src="js/lib/owlcarousel/owl.ca9ousel.min.js"}
-
 {script src="js/tygh/phone_mask.js"}
 {hook name="index:scripts"}
 {/hook}
 
 {script src="js/lib/maskedinput/jquery.maskedinput.min.js"}
-
-
-
 {/scripts}
