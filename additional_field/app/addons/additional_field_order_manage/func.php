@@ -53,7 +53,7 @@ function fn_additional_field_order_manage_get_PhoneFormatted($order_id)
                          object_id = ?i
                          AND
                          ?:profile_fields.section = 'S'
-                         AND ?:profile_fields.class = 'shipping-new-phone'", $order_id);
+                         AND ?:profile_fields.field_name = 's_formatted_phone'", $order_id);
     return !empty($query) ? $query : '';
 }
 
