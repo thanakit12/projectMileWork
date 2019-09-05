@@ -8,9 +8,8 @@
     });
 
     function validate(field) {
-        var phone;
+        let phone;
         const length = field.value.length;
-        console.log(length)
         if (length === 10) {
             phone = field.value.replace(/(\d\d\d)(\d\d\d)(\d\d\d\d)/, "$1-$2-$3");
         } else if (length === 9) {

@@ -41,7 +41,7 @@ function fn_additional_field_order_manage_get_orders_post($params, &$orders)
     }
 }
 
-// This Function return Shipping phone formatted,phone formatted form is xxx-xxx-xxxx.
+// This Function return Shipping phone formatted,phone formatted form is 000-000-0000.
 function fn_additional_field_order_manage_get_PhoneFormatted($order_id)
 {
     $query = db_get_row("SELECT value FROM ?:profile_fields_data
@@ -142,7 +142,7 @@ function fn_formatPhoneNumber($phoneNumber)
     $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
     //if user has phone number  more than one.
     if (strlen($phoneNumber) > 11) {
-        $phoneNumber = 'xxx-xxx-xxxx';
+        $phoneNumber = '000-000-0000';
     } //if phone number format +6682-565-5555
     else if (strlen($phoneNumber) == 11) {
         $nexttwo = substr($phoneNumber, 2, 2);
@@ -241,8 +241,8 @@ function fn_additional_field_order_manage_cleanuser_data()
             $shipping_phone_main_check = fn_formatPhoneNumber($shipping_phone_main);
             $billing_phone_main_check = fn_formatPhoneNumber($billing_phone_main);
 
-            //if format = 'xxx-xxx-xxxx' user have phone number more than one
-            if ($shipping_phone_main_check == 'xxx-xxx-xxxx' || $billing_phone_main_check == 'xxx-xxx-xxxx') {
+            //if format = '000-000-00000' user have phone number more than one
+            if ($shipping_phone_main_check == '000-000-0000' || $billing_phone_main_check == '000-000-0000') {
                 db_query("INSERT INTO `?:profile_fields_data` (`object_id`, `object_type`, `field_id`, `value`)
                values ('$profile_id','P','$field_shipping_formatted_phone','$shipping_phone_main'),
                       ('$profile_id','P','$field_billing_formatted_phone','$billing_phone_main')");

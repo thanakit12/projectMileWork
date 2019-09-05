@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<addon scheme="2.0">
-    <id>admin_format_phone</id>
-    <name>Phone_format_Backend</name>
-    <description>format phone in admin panel</description>
-    <version>1.0</version>
-    <priority>100500</priority>
-    <status>active</status>
-</addon>
