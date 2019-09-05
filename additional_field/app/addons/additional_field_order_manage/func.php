@@ -241,7 +241,7 @@ function fn_additional_field_order_manage_cleanuser_data()
             $shipping_phone_main_check = fn_formatPhoneNumber($shipping_phone_main);
             $billing_phone_main_check = fn_formatPhoneNumber($billing_phone_main);
 
-            //if format = '000-000-00000' user have phone number more than one
+            //if format = '000-000-0000' user have phone number more than one
             if ($shipping_phone_main_check == '000-000-0000' || $billing_phone_main_check == '000-000-0000') {
                 db_query("INSERT INTO `?:profile_fields_data` (`object_id`, `object_type`, `field_id`, `value`)
                values ('$profile_id','P','$field_shipping_formatted_phone','$shipping_phone_main'),
