@@ -159,7 +159,6 @@
                         <span class="radio">{__("address_commercial")}</span>
                         {*Add type phone additional from original*}
                     {elseif $field.field_type == "ProfileFieldTypes::PHONE"|enum}
-                        {script src="js/addons/additional_field_order_manage/func.js"}
                         <input {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if}
                                type="text" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]"
                                size="32" value="{$value}"
@@ -181,4 +180,4 @@
     {/if}
 {/if}
 {*Add script additional from original*}
-{script src = "js/addons/additional_field_order_manage"}
+{script src = "js/addons/additional_field_order_manage/func.js"}
