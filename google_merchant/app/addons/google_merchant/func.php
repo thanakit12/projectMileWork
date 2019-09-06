@@ -102,28 +102,47 @@ function fn_google_merchant_insertBatch($products)
         $product->setBatchId($key);
         $product->setProduct($val);
         $product->setMerchantId($product_data->session->merchantId);
-
         $p[] = $product;
     }
-    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-    $batchRequest->setEntries($p);
-    $product_data->session->service->products->custombatch($batchRequest);
+    fn_print_r($p);
+//    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+//    $batchRequest->setEntries($p);
+//    $product_data->session->service->products->custombatch($batchRequest);
 }
 
 function fn_google_merchant_import_post($pattern, $import_data, $options)
 {
     $collect_data = fn_google_merchant_collect_data($import_data);
     $data_product = fn_google_merchant_prepare_product($collect_data);
-    fn_google_merchant_insertBatch($data_product);
+    $result = [];
+    for ($i = 0; $i < count($data_product); $i++) {
+        if ($data_product[$i] == null) {
+            continue;
+        } else {
+            if ($data_product[$i]->getPrice()->getvalue() == null) {
+                continue;
+            } else {
+                $result[] = $data_product[$i];
+            }
+        }
+    }
+    fn_print_r($result);
+    if (!empty($result)) {
+        fn_google_merchant_insertBatch($result);
+    }
+    else
+        fn_print_r("BYPASS");
+    fn_print_die("SSSSS");
 }
 
 function fn_google_merchant_collect_data($import_data)
 {
     $arr = [];
     for ($i = 0; $i < count($import_data); $i++) {
-        if ((int)$import_data[$i]["th"]["product_code"] > 0) {
-            $arr[] = $import_data[$i]["th"];
-        }
+//        if ((int)$import_data[$i]["th"]["product_code"] > 0) {
+//            $arr[] = $import_data[$i]["th"];
+//        }
+        $arr[] = $import_data[$i]["th"];
     }
     return $arr;
 }
@@ -144,6 +163,7 @@ function fn_google_merchant_prepare_product($collect_data)
         $create_product = fn_google_merchant_create($query["product_id"], $product);
         $products[] = $create_product;
     }
+//    fn_print_r($products);
     return $products;
 }
 
@@ -170,56 +190,71 @@ function fn_google_merchant_tools_change_status($params, $result)
             fn_set_notification('E', __('error'), _('This product does not in google merchant center'));
         }
     } //if have many products select and change status
+    elseif (isset($_REQUEST['product_ids'])) {
+        $product_id = $_REQUEST['product_ids'];
+        $data = [];
+        $mode = $_REQUEST['dispatch'];
+        if ($mode == "products.m_activate") {
+            for ($i = 0; $i < count($product_id); $i++) {
+                $data[] = fn_get_product_data($product_id[$i], $auth, 'th', '', true, true, true, true, false, false, '');
+                $product = fn_google_merchant_create($product_id[$i], $data[$i]);
+                $products[] = $product;
+            }
+            $arr = array_unique($products, SORT_REGULAR);
+            fn_google_merchant_insertBatch($arr);
+        } else if ($mode == "products.m_disable") {
+            for ($i = 0; $i < count($product_id); $i++) {
+                fn_google_merchant_delete($product_id[$i]);
+            }
+        }
+    }
 }
 
 function fn_google_merchant_create($product_id, $product_data)
 {
     $product = new Google_Service_ShoppingContent_Product();
-
     $product_name = $product_data["product"];
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
-    $product_price = $product_data["price"];
 
-    //product_description is import but full_description is add each product
-    if (isset($product_data["product_description"])) {
-        $product_description = $product_data["product_description"];
-        $product_description = fn_rip_tags($product_description); //cut html element tags
-    } else {
-        $product_description = $product_data["full_description"];
-        $product_description = fn_rip_tags($product_description); //cut html element tags
+    fn_print_r($isset_image);
+    if ($isset_image != '') {
+        $product_price = $product_data["price"];
+        //product_description is import but full_description is add each product
+        if (isset($product_data["product_description"])) {
+            $product_description = $product_data["product_description"];
+            $product_description = fn_rip_tags($product_description); //cut html element tags
+        } else {
+            $product_description = $product_data["full_description"];
+            $product_description = fn_rip_tags($product_description); //cut html element tags
+        }
+        if (isset($product_data["brand"])) {
+            $band = $product_data['brand'];
+        } else {
+            $band = '';
+        }
+
+        $product->setOfferId($product_id);
+        $product->setTitle($product_name);
+        $product->setDescription($product_description);
+        $product->setLink($product_url);
+        $product->setCondition('New');
+
+        $price = new Google_Service_ShoppingContent_Price();
+        $price->setValue($product_price);
+        $price->setCurrency('THB');
+        $product->setPrice($price);
+        $product->setAvailability('in stock');
+        $product->setImageLink($isset_image);
+        $product->setGtin('');
+        $product->setMpn('');
+        $product->setBrand($band);
+        $product->setContentLanguage('TH');
+        $product->setTargetCountry('TH');
+        $product->setChannel('online');
+        $product->setIncludedDestinations(["Shopping Ads"]);
+        return $product;
     }
-    if (isset($product_data["brand"])) {
-        $band = $product_data['brand'];
-    } else {
-        $band = '';
-    }
-
-    $product->setOfferId($product_id);
-    $product->setTitle($product_name);
-    $product->setDescription($product_description);
-    $product->setLink($product_url);
-    $product->setCondition('New');
-
-    $price = new Google_Service_ShoppingContent_Price();
-    $price->setValue($product_price);
-    $price->setCurrency('THB');
-    $product->setPrice($price);
-    $product->setAvailability('in stock');
-    $product->setImageLink($isset_image);
-    $product->setGtin('');
-    $product->setMpn('');
-    $product->setBrand($band);
-    $product->setContentLanguage('TH');
-    $product->setTargetCountry('TH');
-    $product->setChannel('online');
-    $product->setIncludedDestinations(["Shopping Ads"]);
-    return $product;
 }
 
-function fn_google_merchant_deleteBatch($product_id)
-{
-    $product = new Product();
-    $product->DeleteBatch($product_id);
-}
 
