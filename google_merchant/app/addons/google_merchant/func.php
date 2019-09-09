@@ -25,7 +25,7 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
                 //D - Disable
                 if ($product_status == 'A') {
                     $product = fn_google_merchant_create($product_id, $product_data);
-//                    fn_google_merchant_insert($product);
+                    fn_google_merchant_insert($product);
                 } elseif ($product_status == 'D') {
                     fn_google_merchant_delete($product_id);
                 }
@@ -104,7 +104,6 @@ function fn_google_merchant_insertBatch($products)
         $product->setMerchantId($product_data->session->merchantId);
         $p[] = $product;
     }
-    fn_print_r($p);
     $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
     $batchRequest->setEntries($p);
     $product_data->session->service->products->custombatch($batchRequest);
@@ -115,10 +114,12 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
     $collect_data = fn_google_merchant_collect_data($import_data);
     $data_product = fn_google_merchant_prepare_product($collect_data);
     $result = [];
+    // check product has imagelink
     for ($i = 0; $i < count($data_product); $i++) {
         if ($data_product[$i] == null) {
             continue;
-        } else {
+        } // check field_mapping has selected price
+        else {
             if ($data_product[$i]->getPrice()->getvalue() == null) {
                 continue;
             } else {
@@ -128,7 +129,7 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
     }
     if (!empty($result)) {
         fn_google_merchant_insertBatch($result);
-    } 
+    }
 }
 
 function fn_google_merchant_collect_data($import_data)
