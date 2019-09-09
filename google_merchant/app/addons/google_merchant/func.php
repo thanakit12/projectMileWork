@@ -25,7 +25,7 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
                 //D - Disable
                 if ($product_status == 'A') {
                     $product = fn_google_merchant_create($product_id, $product_data);
-                    fn_google_merchant_insert($product);
+//                    fn_google_merchant_insert($product);
                 } elseif ($product_status == 'D') {
                     fn_google_merchant_delete($product_id);
                 }
@@ -105,9 +105,9 @@ function fn_google_merchant_insertBatch($products)
         $p[] = $product;
     }
     fn_print_r($p);
-//    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-//    $batchRequest->setEntries($p);
-//    $product_data->session->service->products->custombatch($batchRequest);
+    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+    $batchRequest->setEntries($p);
+    $product_data->session->service->products->custombatch($batchRequest);
 }
 
 function fn_google_merchant_import_post($pattern, $import_data, $options)
@@ -126,22 +126,15 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
             }
         }
     }
-    fn_print_r($result);
     if (!empty($result)) {
         fn_google_merchant_insertBatch($result);
-    }
-    else
-        fn_print_r("BYPASS");
-    fn_print_die("SSSSS");
+    } 
 }
 
 function fn_google_merchant_collect_data($import_data)
 {
     $arr = [];
     for ($i = 0; $i < count($import_data); $i++) {
-//        if ((int)$import_data[$i]["th"]["product_code"] > 0) {
-//            $arr[] = $import_data[$i]["th"];
-//        }
         $arr[] = $import_data[$i]["th"];
     }
     return $arr;
@@ -163,7 +156,6 @@ function fn_google_merchant_prepare_product($collect_data)
         $create_product = fn_google_merchant_create($query["product_id"], $product);
         $products[] = $create_product;
     }
-//    fn_print_r($products);
     return $products;
 }
 
@@ -217,7 +209,6 @@ function fn_google_merchant_create($product_id, $product_data)
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
 
-    fn_print_r($isset_image);
     if ($isset_image != '') {
         $product_price = $product_data["price"];
         //product_description is import but full_description is add each product
