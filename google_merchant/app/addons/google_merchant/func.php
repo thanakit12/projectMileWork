@@ -153,10 +153,11 @@ function fn_google_merchant_prepare_product($collect_data)
         $product["full_description"] = $collect_data[$i]["full_description"];
         $product["price"] = $collect_data[$i]["price"];
         $product["product"] = $collect_data[$i]["product"];
-        $product["brand"] = fn_exim_get_product_features($query["product_id"], "///", "th");
+        $product["brand"] = fn_google_merchant_GetBrand($query["product_id"]);
         $create_product = fn_google_merchant_create($query["product_id"], $product);
         $products[] = $create_product;
     }
+
     return $products;
 }
 
@@ -209,7 +210,6 @@ function fn_google_merchant_create($product_id, $product_data)
     $product_name = $product_data["product"];
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
-
     if ($isset_image != '') {
         $product_price = $product_data["price"];
         //product_description is import but full_description is add each product
@@ -223,7 +223,7 @@ function fn_google_merchant_create($product_id, $product_data)
         if (isset($product_data["brand"])) {
             $band = $product_data['brand'];
         } else {
-            $band = '';
+            $band = fn_google_merchant_GetBrand($product_id);
         }
 
         $product->setOfferId($product_id);
@@ -249,4 +249,12 @@ function fn_google_merchant_create($product_id, $product_data)
     }
 }
 
+function fn_google_merchant_GetBrand($product_id)
+{
+    $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = 'รุ่นรถ' AND lang_code = 'th'");
+    $feature_id = $query['feature_id'];
+    $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+    $value = $query_value['value'];
+    return $value;
+}
 
