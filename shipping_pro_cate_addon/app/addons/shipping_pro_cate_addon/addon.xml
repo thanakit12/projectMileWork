@@ -12,7 +12,51 @@
         </author>
     </authors>
     <settings edition_type="ROOT">
+        <sections>
+            <section id="general">
+                <name>General</name>
+                <items>
+                    <item id="main">
+                        <name>General settings</name>
+                        <type>header</type>
+                        <handler/>
+                        <variants/>
+                    </item>
+                    <item id="product_group">
+                        <name>Products groupping</name>
+                        <type>selectbox</type>
+                    </item>
+                    <item id="others">
+                        <name>Other settings</name>
+                        <type>header</type>
+                        <handler/>
+                        <variants/>
+                    </item>
+                </items>
+            </section>
+        </sections>
     </settings>
+    <queries>
+        <item>
+            ALTER TABLE `?:shippings`
+            ADD `for_products_only` char(1) COLLATE 'utf8_general_ci' NOT NULL DEFAULT 'N';
+        </item>
+        <item>
+            ALTER TABLE `?:products`
+            ADD `shipping_ids` varchar(255) COLLATE 'utf8_general_ci' NOT NULL DEFAULT '0';
+        </item>
+        <item for="uninstall">
+            ALTER TABLE `?:shippings`
+            DROP `for_products_only`;
+        </item>
+        <item for="uninstall">
+            ALTER TABLE `?:products`
+            DROP `shipping_ids`;
+        </item>
+    </queries>
+    <language_variables>
+        <item lang="th" id="product_group">เชคว่าใช่ไหม</item>
+    </language_variables>
     <compatibility>
         <core_edition>
             MULTIVENDOR
