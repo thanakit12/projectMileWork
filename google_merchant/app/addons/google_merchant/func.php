@@ -94,19 +94,24 @@ function fn_google_merchant_delete($product_id)
 
 function fn_google_merchant_insertBatch($products)
 {
-    $product_data = new Product();
-    $p = [];
-    foreach ($products as $key => $val) {
-        $product = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
-        $product->setMethod('insert');
-        $product->setBatchId($key);
-        $product->setProduct($val);
-        $product->setMerchantId($product_data->session->merchantId);
-        $p[] = $product;
+    try {
+        $p = [];
+        $product_data = new Product();
+        foreach ($products as $key => $val) {
+            $product = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
+            $product->setMethod('insert');
+            $product->setBatchId($key);
+            $product->setProduct($val);
+            $product->setMerchantId($product_data->session->merchantId);
+            $p[] = $product;
+        }
+        $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+        $batchRequest->setEntries($p);
+        $product_data->session->service->products->custombatch($batchRequest);
+    } catch (Exception $e) {
+        fn_print_r("error = {$e->getMessage()}\n");
     }
-    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-    $batchRequest->setEntries($p);
-    $product_data->session->service->products->custombatch($batchRequest);
+
 }
 
 function fn_google_merchant_import_post($pattern, $import_data, $options)
@@ -120,7 +125,7 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
             continue;
         } // check field_mapping has selected price
         else {
-            if ($data_product[$i]->getPrice()->getvalue() == null) {
+            if ($data_product[$i]->getPrice()->getvalue() == null || $data_product[$i]->getAvailability() == 'Out of stock') {
                 continue;
             } else {
                 $result[] = $data_product[$i];
@@ -144,6 +149,7 @@ function fn_google_merchant_collect_data($import_data)
 function fn_google_merchant_prepare_product($collect_data)
 {
     $products = [];
+    $result = [];
     for ($i = 0; $i < count($collect_data); $i++) {
         $product_id[] = $collect_data[$i]["product_code"];
         $company_id[] = $collect_data[$i]["company"]; //Vendor
@@ -153,8 +159,18 @@ function fn_google_merchant_prepare_product($collect_data)
         $product["full_description"] = $collect_data[$i]["full_description"];
         $product["price"] = $collect_data[$i]["price"];
         $product["product"] = $collect_data[$i]["product"];
-        $create_product = fn_google_merchant_create($query["product_id"], $product);
-        $products[] = $create_product;
+        $product["status"] = isset($collect_data[$i]["status"]) ? $collect_data[$i]["status"] : fn_google_merchant_getStatus($query['product_id']);
+//check product status if status Active push to google merchant if status disable delete from google merchant
+        if ($product["status"] == 'A') {
+            $create_product = fn_google_merchant_create($query["product_id"], $product);
+            $products[] = $create_product;
+        } elseif ($product["status"] == 'D') {
+            $collect_Id = $query["product_id"];
+            $result[] = $collect_Id;
+        }
+    }
+    if (!empty($result)) {
+        fn_google_merchant_DeleteProductBatch($result);
     }
     return $products;
 }
@@ -209,6 +225,8 @@ function fn_google_merchant_create($product_id, $product_data)
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
     $brand = fn_google_merchant_GetBrand($product_id);
+    $amount = fn_google_merchant_IsExist($product_id);
+
     if ($isset_image != '') {
         $product_price = $product_data["price"];
         //product_description is import but full_description is add each product
@@ -230,7 +248,11 @@ function fn_google_merchant_create($product_id, $product_data)
         $price->setValue($product_price);
         $price->setCurrency('THB');
         $product->setPrice($price);
-        $product->setAvailability('in stock');
+        if ($amount) {
+            $product->setAvailability('in stock');
+        } else {
+            $product->setAvailability('Out of stock');
+        }
         $product->setImageLink($isset_image);
         $product->setGtin('');
         $product->setMpn('');
@@ -252,3 +274,37 @@ function fn_google_merchant_GetBrand($product_id)
     return !empty($value) ? $value : '';
 }
 
+function fn_google_merchant_IsExist($product_id)
+{
+    $query = db_get_row("SELECT amount FROM ?:products where product_id = ?i", $product_id);
+    $amount = $query["amount"];
+    if ($amount > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function fn_google_merchant_getStatus($product_id)
+{
+    $query = db_get_row("SELECT status FROM ?:products WHERE product_id = ?i", $product_id);
+    $status = $query['status'];
+    return !empty($query['status']) ? $status : '';
+}
+
+function fn_google_merchant_DeleteProductBatch($products)
+{
+    $p = [];
+    $product = new Product();
+    foreach ($products as $key => $offerId) {
+        $entry = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
+        $entry->setMethod('delete');
+        $entry->setBatchId($key);
+        $entry->setProductId($product->buildProductId($offerId));
+        $entry->setMerchantId($product->session->merchantId);
+        $p[] = $entry;
+    }
+    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+    $batchRequest->setEntries($p);
+    $product->session->service->products->custombatch($batchRequest);
+}
