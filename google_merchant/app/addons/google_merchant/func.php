@@ -111,7 +111,6 @@ function fn_google_merchant_insertBatch($products)
     } catch (Exception $e) {
         fn_print_r("error = {$e->getMessage()}\n");
     }
-
 }
 
 function fn_google_merchant_import_post($pattern, $import_data, $options)
@@ -180,7 +179,6 @@ function fn_google_merchant_prepare_product($collect_data)
 function fn_google_merchant_tools_change_status($params, $result)
 {
     $auth = $_SESSION["auth"];
-    $products = [];
 
     //This section is insert or delete one product to google merchant when click tool.updates_status on products.manage page
     if (isset($params['dispatch'])) {
@@ -190,30 +188,14 @@ function fn_google_merchant_tools_change_status($params, $result)
             if ($status == 'A') {
                 $data = fn_get_product_data($product_id, $auth, 'th', '', true, true, true, true, false, false, '');
                 $product = fn_google_merchant_create($product_id, $data);
-                fn_google_merchant_insert($product);
+                if ($product != null) {
+                    fn_google_merchant_insert($product);
+                }
             } elseif ($status == 'D') {
                 fn_google_merchant_delete($product_id);
             }
         } catch (Exception $e) {
             fn_set_notification('E', __('error'), _('This product does not in google merchant center'));
-        }
-    } //if have many products select and change status
-    elseif (isset($_REQUEST['product_ids'])) {
-        $product_id = $_REQUEST['product_ids'];
-        $data = [];
-        $mode = $_REQUEST['dispatch'];
-        if ($mode == "products.m_activate") {
-            for ($i = 0; $i < count($product_id); $i++) {
-                $data[] = fn_get_product_data($product_id[$i], $auth, 'th', '', true, true, true, true, false, false, '');
-                $product = fn_google_merchant_create($product_id[$i], $data[$i]);
-                $products[] = $product;
-            }
-            $arr = array_unique($products, SORT_REGULAR);
-            fn_google_merchant_insertBatch($arr);
-        } else if ($mode == "products.m_disable") {
-            for ($i = 0; $i < count($product_id); $i++) {
-                fn_google_merchant_delete($product_id[$i]);
-            }
         }
     }
 }
@@ -234,8 +216,11 @@ function fn_google_merchant_create($product_id, $product_data)
             $product_description = $product_data["product_description"];
             $product_description = fn_rip_tags($product_description); //cut html element tags
         } else {
-            $product_description = $product_data["full_description"];
-            $product_description = fn_rip_tags($product_description); //cut html element tags
+            if (!empty($product_description)) {
+                $product_description = $product_data["full_description"];
+                $product_description = fn_rip_tags($product_description); //cut html element tags
+            } else
+                $product_description = '';
         }
 
         $product->setOfferId($product_id);
@@ -270,8 +255,8 @@ function fn_google_merchant_GetBrand($product_id)
     $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = 'รุ่นรถ' AND lang_code = 'th'");
     $feature_id = $query['feature_id'];
     $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
-    $value = $query_value['value'];
-    return !empty($value) ? $value : '';
+
+    return !empty($query_value) ? $query_value["value"] : '';
 }
 
 function fn_google_merchant_IsExist($product_id)

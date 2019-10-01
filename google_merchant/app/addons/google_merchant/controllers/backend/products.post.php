@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_REQUEST['product_ids'])) {
             try {
                 $product_id = $_REQUEST['product_ids'];
-                fn_google_merchant_deleteBatch($product_id);
+                fn_google_merchant_DeleteProductBatch($product_id);
             } catch (Exception $e) {
                 $http_code = $e->getCode();
                 if ($http_code == "404") {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     }
-    if ($mode == "m_activate") {
+   else if ($mode == "m_activate") {
         if (isset($_REQUEST['product_ids'])) {
             $product_id = $_REQUEST['product_ids'];
             $data = [];
@@ -29,8 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $product = fn_google_merchant_create($product_id[$i], $data[$i]);
                 $products[] = $product;
             }
-            $arr = array_unique($products, SORT_REGULAR);
-            fn_google_merchant_insertBatch($arr);
+            fn_google_merchant_insertBatch($products);
         }
     }
 }
