@@ -1,0 +1,17 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: ไทย\n"
+"Language: th_TH"
+
+msgctxt "Addons::name::blog_extend_permission"
+msgid "blog_extend"
+msgstr "สิทธื์จัดการ Blog"
+
+msgctxt "SettingsSections::blog_extend_permission::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsOptions::blog_extend_permission::permission_vendor"
+msgid "Permission_Vendor "
+msgstr ""

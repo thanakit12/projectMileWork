@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>blog_extend_permission</id>
+    <name>Additional Field Order Page</name>
+    <version>1.0.1</version>
+    <priority>100502</priority>
+    <status>active</status>
+    <supplier>Thanakit</supplier>
+    <authors>
+        <author>
+            <name>thanakit</name>
+        </author>
+    </authors>
+    <settings edition_type="ROOT">
+    </settings>
+    <compatibility>
+        <core_edition>
+            MULTIVENDOR
+        </core_edition>
+    </compatibility>
+</addon>
