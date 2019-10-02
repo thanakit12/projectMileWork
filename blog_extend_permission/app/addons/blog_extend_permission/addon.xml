@@ -1,11 +1,22 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>blog_extend_permission</id>
-    <name>Additional Field Order Page</name>
     <version>1.0.1</version>
     <priority>100502</priority>
     <status>active</status>
     <supplier>Thanakit</supplier>
+    <settings edition_type="ROOT">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="permission_vendor">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
     <authors>
         <author>
             <name>thanakit</name>
