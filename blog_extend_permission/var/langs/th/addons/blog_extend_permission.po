@@ -6,7 +6,7 @@ msgstr "Project-Id-Version: tygh\n"
 
 msgctxt "Addons::name::blog_extend_permission"
 msgid "blog_extend"
-msgstr "สิทธื์จัดการ Blog"
+msgstr "สิทธิ์ดการ Blog"
 
 msgctxt "Addons::description::blog_extend_permission"
 msgid "addon ตัวนี้ เป็น addon เกี่ยวกับการจะให้ สิทธิ์ของ vendor ว่าจะให้มีสิทธิ์ในการจัดการ blog โดย default คือ ไม่ให้ vendor มีสิทธิ์ แต่ถ้าต้องการ ให้ vendor มีสิทธิ์ เข้าไป ติ๊กถูกออก จาก checkbox"
