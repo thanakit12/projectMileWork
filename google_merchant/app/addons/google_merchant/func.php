@@ -4,6 +4,8 @@ require_once "content/BaseSample.php";
 require_once "content/Product.php";
 require_once "content/php/vendor/autoload.php";
 
+use Tygh\Registry;
+
 if (!defined('AREA')) {
     die('Access denied');
 }
@@ -25,7 +27,9 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
                 //D - Disable
                 if ($product_status == 'A') {
                     $product = fn_google_merchant_create($product_id, $product_data);
-                    fn_google_merchant_insert($product);
+                    if ($product != null) {
+                        fn_google_merchant_insert($product);
+                    }
                 } elseif ($product_status == 'D') {
                     fn_google_merchant_delete($product_id);
                 }
@@ -109,8 +113,9 @@ function fn_google_merchant_insertBatch($products)
         $batchRequest->setEntries($p);
         $product_data->session->service->products->custombatch($batchRequest);
     } catch (Exception $e) {
-        fn_print_r("error = {$e->getMessage()}\n");
+        fn_set_notification('E', __('error'), _("Have something error") . ' ' . $e->getMessage());
     }
+
 }
 
 function fn_google_merchant_import_post($pattern, $import_data, $options)
@@ -124,7 +129,7 @@ function fn_google_merchant_import_post($pattern, $import_data, $options)
             continue;
         } // check field_mapping has selected price
         else {
-            if ($data_product[$i]->getPrice()->getvalue() == null || $data_product[$i]->getAvailability() == 'Out of stock') {
+            if ($data_product[$i]->getPrice()->getvalue() == null) {
                 continue;
             } else {
                 $result[] = $data_product[$i];
@@ -169,7 +174,7 @@ function fn_google_merchant_prepare_product($collect_data)
         }
     }
     if (!empty($result)) {
-        fn_google_merchant_DeleteProductBatch($result);
+       fn_google_merchant_DeleteProductBatch($result);
     }
     return $products;
 }
@@ -209,7 +214,8 @@ function fn_google_merchant_create($product_id, $product_data)
     $brand = fn_google_merchant_GetBrand($product_id);
     $amount = fn_google_merchant_IsExist($product_id);
 
-    if ($isset_image != '') {
+    //check product has image and has amount
+    if ($isset_image != '' && $amount) {
         $product_price = $product_data["price"];
         //product_description is import but full_description is add each product
         if (isset($product_data["product_description"])) {
@@ -233,11 +239,7 @@ function fn_google_merchant_create($product_id, $product_data)
         $price->setValue($product_price);
         $price->setCurrency('THB');
         $product->setPrice($price);
-        if ($amount) {
-            $product->setAvailability('in stock');
-        } else {
-            $product->setAvailability('Out of stock');
-        }
+        $product->setAvailability('in stock');
         $product->setImageLink($isset_image);
         $product->setGtin('');
         $product->setMpn('');
@@ -252,7 +254,8 @@ function fn_google_merchant_create($product_id, $product_data)
 
 function fn_google_merchant_GetBrand($product_id)
 {
-    $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = 'รุ่นรถ' AND lang_code = 'th'");
+    $string = Registry::get('addons.google_merchant.brand_value');
+    $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
     $feature_id = $query['feature_id'];
     $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
 
@@ -292,4 +295,17 @@ function fn_google_merchant_DeleteProductBatch($products)
     $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
     $batchRequest->setEntries($p);
     $product->session->service->products->custombatch($batchRequest);
+}
+
+function fn_google_merchant_checkEmpty($data)
+{
+    $result = [];
+    foreach ($data as $key => $val) {
+        if ($val == '')
+            continue;
+        else {
+            $result[] = $val;
+        }
+    }
+    return $result;
 }

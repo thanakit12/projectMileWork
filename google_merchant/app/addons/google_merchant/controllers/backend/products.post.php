@@ -15,12 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $http_code = $e->getCode();
                 if ($http_code == "404") {
                 } else {
-                    fn_print_r($e->getMessage());
+                    fn_set_notification('E', __('error'), _("Have something error") . ' ' . $e->getMessage());
                 }
             }
         }
-    }
-   else if ($mode == "m_activate") {
+    } else if ($mode == "m_activate" || $mode == "m_update") {
         if (isset($_REQUEST['product_ids'])) {
             $product_id = $_REQUEST['product_ids'];
             $data = [];
@@ -29,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $product = fn_google_merchant_create($product_id[$i], $data[$i]);
                 $products[] = $product;
             }
-            fn_google_merchant_insertBatch($products);
+            $result_product = fn_google_merchant_checkEmpty($products);
+            fn_google_merchant_insertBatch($result_product);
         }
     }
 }
