@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<addon scheme="2.0">
+<addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
     <id>blog_extend_permission</id>
+    <description>addon ตัวนี้ เป็น addon เกี่ยวกับการจะให้ สิทธิ์ของ vendor ว่าจะให้มีสิทธิ์ในการจัดการ blog โดย default คือ ไม่ให้ vendor มีสิทธิ์ แต่ถ้าต้องการ ให้ vendor มีสิทธิ์ เข้าไป ติ๊กถูกออก จาก checkbox</description>
     <version>1.0.1</version>
     <priority>100502</priority>
     <status>active</status>
