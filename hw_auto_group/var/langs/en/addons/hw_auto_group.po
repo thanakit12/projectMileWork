@@ -1,0 +1,49 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+
+msgctxt "LanguageName"
+msgid "Localized language name"
+msgstr "English"
+
+msgctxt "Addons::name::hw_auto_group"
+msgid "Auto Add User To Group on Register"
+msgstr "Auto Add User To Group on Register"
+
+msgctxt "Addons::description::hw_auto_group"
+msgid "Customers are now automatically assigned to your new group."
+msgstr "Customers are now automatically assigned to your new group."
+
+msgctxt "SettingsSections::hw_auto_group::license_updates"
+msgid "License & Updates"
+msgstr "License & Updates"
+
+msgctxt "SettingsOptions::hw_auto_group::usergroup_id"
+msgid "User group"
+msgstr "User group"
+
+msgctxt "SettingsOptions::hw_auto_group::notify"
+msgid "Send notification"
+msgstr "Send notification"
+
+msgctxt "SettingsSections::hw_auto_group::license_updates"
+msgid "License & Updates"
+msgstr "License & Updates"
+
+msgctxt "SettingsOptions::hw_auto_group::license"
+msgid "License key"
+msgstr "License key"
+
+msgctxt "Languages::hw_license_generator"
+msgid "[ Click here to generate license key ]"
+msgstr "[ Click here to generate license key ]"
+
+msgctxt "SettingsTooltips::hw_auto_group::license"
+msgid "To be able to upgrade to a new version using CS-Cart Upgrade Center you will need have a valid license key."
+msgstr "To be able to upgrade to a new version using CS-Cart Upgrade Center you will need have a valid license key."
+
+msgctxt "SettingsSections::hw_auto_group::support"
+msgid "Hungryweb Support & FAQ's"
+msgstr "Hungryweb Support & FAQ's"
