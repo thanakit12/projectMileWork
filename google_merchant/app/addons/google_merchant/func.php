@@ -4,7 +4,9 @@ require_once "content/BaseSample.php";
 require_once "content/Product.php";
 require_once "content/php/vendor/autoload.php";
 
+use Tygh\Api;
 use Tygh\Registry;
+use Tygh\Api\Request;
 
 if (!defined('AREA')) {
     die('Access denied');
@@ -31,7 +33,28 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
                         fn_google_merchant_insert($product);
                     }
                 } elseif ($product_status == 'D') {
-                    fn_google_merchant_delete($product_id);
+                    $result = fn_google_merchant_getProductFromMerchant($product_id);
+                    if ($result != false) {
+                        fn_google_merchant_delete($product_id);
+                    }
+                }
+            } // if have api request
+            elseif (Tygh::$app['api'] instanceof Api) {
+                $request = new Request();
+                $method = $request->getMethod();
+                if ($method == 'PUT') {
+                    if ($product_status == 'A') {
+                        $data = fn_get_product_data($product_id, $_SESSION['auth']);
+                        $product = fn_google_merchant_create($product_id, $data);
+                        if ($product != null) {
+                            fn_google_merchant_insert($product);
+                        }
+                    } elseif ($product_status == 'D') {
+                        $check_product = fn_google_merchant_getProductFromMerchant($product_id);
+                        if ($check_product != false) {
+                            fn_google_merchant_delete($product_id);
+                        }
+                    }
                 }
             } // else one product click change status in products.manage then pass parameter to functions
             else {
@@ -42,6 +65,7 @@ function fn_google_merchant_update_product_post($product_data, $product_id, $lan
                 }
             }
         }
+
     }
 }
 
@@ -170,12 +194,16 @@ function fn_google_merchant_prepare_product($collect_data)
             $products[] = $create_product;
         } elseif ($product["status"] == 'D') {
             $collect_Id = $query["product_id"];
-            $result[] = $collect_Id;
+            $chk_product = fn_google_merchant_getProductFromMerchant($collect_Id);
+            if ($chk_product != false) {
+                $result[] = $collect_Id;
+            }
         }
     }
     if (!empty($result)) {
-       fn_google_merchant_DeleteProductBatch($result);
+        fn_google_merchant_DeleteProductBatch($result);
     }
+
     return $products;
 }
 
@@ -308,4 +336,19 @@ function fn_google_merchant_checkEmpty($data)
         }
     }
     return $result;
+}
+
+function fn_google_merchant_getProductFromMerchant($offer_id)
+{
+    $product = new Product();
+    try {
+        $productId = $product->buildProductId($offer_id);
+        $product = $product->session->service->products->get($product->session->merchantId, $productId);
+    } catch (Exception $e) {
+        if ($e->getCode() == '404') {
+            $product = false;
+        }
+    }
+
+    return $product;
 }

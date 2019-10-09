@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } catch (Exception $e) {
             if ($e->getCode() == '404') {
             } else {
-                fn_print_r($e->getMessage());
+                fn_set_notification('E', __('error'), _("Have something error") . ' ' . $e->getMessage());
             }
         }
     }
