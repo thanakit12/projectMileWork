@@ -1,0 +1,40 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Thai\n"
+"Language: th_TH"
+
+msgctxt "Addons::name::page_views_addon"
+msgid "Page Views"
+msgstr "Page Views"
+
+msgctxt "Addons::description::page_views_addon"
+msgid "page_views_addon"
+msgstr "Page View For Vendor & Admin"
+
+msgctxt "Languages::page_views_addon_menu_description"
+msgid "page_views_addon_menu_description"
+msgstr "สามารถดูจำนวนการคลิ๊ก จำนวนชิ้นที่ขาย จำนวนครั้งที่สินค้านั้นถูกเพิ่มลงตะกร้า ของร้านค้านั้นๆได้"
+
+msgctxt "Languages::page_views_addon"
+msgid "page_views_addon"
+msgstr "เพจ วิว"
+
+msgctxt "Languages::viewed"
+msgid "viewed"
+msgstr "ยอดวิวของสินค้า"
+
+msgctxt "Languages::added_to_cart"
+msgid "added_to_cart"
+msgstr "จำนวนสินค้าที่ถูกเพิ่มลงไปในตะกร้า"
+
+msgctxt "Languages::deleted_from_cart"
+msgid "deleted_from_cart"
+msgstr "จำนวนสินค้าที่ถูกเอาออกจากตะกร้า"
+
+msgctxt "Languages::bought"
+msgid "bought"
+msgstr "จำนวนที่ถูกขายไป"
+
+
+
