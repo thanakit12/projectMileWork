@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
+    <id>page_views_addon</id>
+    <version>1.0.1</version>
+    <priority>100502</priority>
+    <status>active</status>
+    <supplier>Thanakit</supplier>
+    <authors>
+        <author>
+            <name>thanakit</name>
+        </author>
+    </authors>
+    <compatibility>
+        <core_edition>
+            MULTIVENDOR
+        </core_edition>
+    </compatibility>
+</addon>

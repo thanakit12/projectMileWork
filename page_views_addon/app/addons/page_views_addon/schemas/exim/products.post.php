@@ -10,12 +10,12 @@ $schema['export_fields']['Viewed'] = array(
     'db_field' => 'viewed',
 );
 
-$schema['export_fields']['Add To Cart'] = array(
+$schema['export_fields']['added_to_cart'] = array(
     'table' => 'product_popularity',
     'db_field' => 'added',
 );
 
-$schema['export_fields']['del From Cart'] = array(
+$schema['export_fields']['deleted_from_cart'] = array(
     'table' => 'product_popularity',
     'db_field' => 'deleted',
 );
