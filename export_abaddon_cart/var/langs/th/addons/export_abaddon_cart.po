@@ -1,0 +1,17 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Thai\n"
+"Language: th_TH"
+
+msgctxt "Addons::name::export_abaddon_cart"
+msgid "ABaddon_Cart"
+msgstr "ABaddon_Cart"
+
+msgctxt "Addons::description::export_abaddon_cart"
+msgid ""
+msgstr "export ข้อมูลหน้า รถเข็นทอดทิ้ง"
+
+msgctxt "Languages::abaddon_cart"
+msgid "abaddon_cart"
+msgstr "รถเข็นทอดทิ้ง"
