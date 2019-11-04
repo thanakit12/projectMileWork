@@ -2,12 +2,12 @@
 
 use Tygh\Registry;
 
-function fn_export_abaddon_cart_timestamp_to_date($timestamp)
+function fn_export_abandoned_carts_timestamp_to_date($timestamp)
 {
     return !empty($timestamp) ? date('d/m/Y ', intval($timestamp)) : '';
 }
 
-function fn_export_abaddon_cart_getBoxSize($product_id)
+function fn_export_abandoned_carts_getBoxSize($product_id)
 {
 
     $shipping_params = db_get_field('SELECT shipping_params FROM ?:products WHERE product_id = ?i', $product_id);
@@ -22,7 +22,7 @@ function fn_export_abaddon_cart_getBoxSize($product_id)
 }
 
 
-function fn_export_abaddon_cart_GetVendor($product_id, $lang_code = 'th')
+function fn_export_abandoned_carts_GetVendor($product_id, $lang_code = 'th')
 {
     $sql = db_get_row("SELECT ?:companies.company FROM ?:companies INNER JOIN ?:products ON ?:products.company_id = ?:companies.company_id
                         WHERE  ?:products.product_id = ?i AND  ?:companies.lang_code = ?s", $product_id, $lang_code);

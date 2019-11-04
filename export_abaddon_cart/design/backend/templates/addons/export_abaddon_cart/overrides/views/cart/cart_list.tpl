@@ -202,8 +202,7 @@
         {capture name="tools_list"}
             <li>{btn type="delete" text=__("delete_all_found") dispatch="dispatch[cart.m_delete_all]" form="carts_list_form" class="cm-confirm cm-submit"}</li>
             <li>{btn type="delete_selected" dispatch="dispatch[cart.m_delete]" form="carts_list_form"}</li>
-            <li>{btn type="list" text={__("export_selected")} dispatch="dispatch[export_abaddon_cart.export_range]" form="carts_list_form"}</li>
-            {*            <li class="mobile-hide">{btn type="export_range"text=__("export_selected") dispatch="dispatch[export_abaddon_cart.export_range]" form="carts_list_form"}</li>*}
+            <li>{btn type="list" text={__("export_selected")} dispatch="dispatch[export_abandoned_carts.export_range]" form="carts_list_form"}</li>
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
     {/if}

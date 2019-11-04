@@ -2,18 +2,18 @@
 
 use Tygh\Registry;
 
-include_once(Registry::get('config.dir.addons') . 'export_abaddon_cart/schemas/exim/abaddoned_carts.functions.php');
+include_once(Registry::get('config.dir.addons') . 'export_abandoned_carts/schemas/exim/abandoned_carts.functions.php');
 include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 
 $schema = array(
-    'section' => 'abaddoned_carts',
-    'pattern_id' => 'abaddoned_carts',
-    'name' => __('abaddoned_carts'),
+    'section' => 'abandoned_carts',
+    'pattern_id' => 'abandoned_carts',
+    'name' => __('abandoned_carts'),
     'key' => array('user_id', 'item_id'),
     'order' => 1,
     'table' => 'user_session_products',
     'permissions' => array(
-        'export' => 'view_abaddoned_carts',
+        'export' => 'view_abandoned_carts',
     ),
     'references' => array(
         'users' => array(
@@ -54,7 +54,7 @@ $schema = array(
     ),
     'range_options' => array(
         'selector_url' => 'cart.cart_list',
-        'object_name' => __('abaddoned_carts'),
+        'object_name' => __('abandoned_carts'),
     ),
     'export_fields' => array(
         'User ID' => array(
@@ -74,7 +74,7 @@ $schema = array(
         ),
         'timestamp' => array(
             'db_field' => 'timestamp',
-            'process_get' => array('fn_export_abaddon_cart_timestamp_to_date', '#this'),
+            'process_get' => array('fn_export_abandoned_carts_timestamp_to_date', '#this'),
             'convert_put' => array('fn_date_to_timestamp', '#this'),
         ),
         'Product ID' => array(
@@ -177,7 +177,7 @@ $schema = array(
         'Box Size' => array(
             'db_field' => 'product_id',
             'table' => 'products',
-            'process_get' => array('fn_export_abaddon_cart_getBoxSize', '#this'),
+            'process_get' => array('fn_export_abandoned_carts_getBoxSize', '#this'),
         ),
         'Category' => array(
             'db_field' => 'product_id',
@@ -194,7 +194,7 @@ $schema = array(
         'Vendor' => array(
             'db_field' => 'product_id',
             'table' => 'products',
-            'process_get' => array('fn_export_abaddon_cart_GetVendor', '#this', '#lang_code'),
+            'process_get' => array('fn_export_abandoned_carts_GetVendor', '#this', '#lang_code'),
         ),
         'Shipping freight Exact' => array(
             'db_field' => 'shipping_freight',
