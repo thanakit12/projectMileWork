@@ -9,12 +9,12 @@ if ($mode == "export_range") {
         if (empty(Tygh::$app['session']['export_ranges'])) {
             Tygh::$app['session']['export_ranges'] = array();
         }
-        if (empty(Tygh::$app['session']['export_ranges']['abaddon_cart'])) {
-            Tygh::$app['session']['export_ranges']['abaddon_cart'] = array('pattern_id' => 'abaddon_cart');
+        if (empty(Tygh::$app['session']['export_ranges']['abaddoned_carts'])) {
+            Tygh::$app['session']['export_ranges']['abaddoned_carts'] = array('pattern_id' => 'abaddoned_carts');
         }
-        Tygh::$app['session']['export_ranges']['abaddon_cart']['data'] = array('user_id' => $_REQUEST['user_ids']);
+        Tygh::$app['session']['export_ranges']['abaddoned_carts']['data'] = array('user_id' => $_REQUEST['user_ids']);
         unset($_REQUEST['redirect_url']);
 
-        return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section=abaddon_cart&pattern_id=' . Tygh::$app['session']['export_ranges']['abaddon_cart']['pattern_id']);
+        return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section=abaddoned_carts&pattern_id=' . Tygh::$app['session']['export_ranges']['abaddoned_carts']['pattern_id']);
     }
 }

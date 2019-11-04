@@ -1,7 +1,7 @@
 <?php
 
-$schema['top']['administration']['items']['export_data']['subitems']['abaddon_cart'] = array(
-    'href' => 'exim.export?section=abaddon_cart',
+$schema['top']['administration']['items']['export_data']['subitems']['abaddoned_carts'] = array(
+    'href' => 'exim.export?section=abaddoned_carts',
     'position' => 201
 );
 
