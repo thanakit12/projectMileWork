@@ -2,18 +2,18 @@
 
 use Tygh\Registry;
 
-include_once(Registry::get('config.dir.addons') . 'export_abaddon_cart/schemas/exim/abaddon_cart.functions.php');
+include_once(Registry::get('config.dir.addons') . 'export_abaddon_cart/schemas/exim/abaddoned_carts.functions.php');
 include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 
 $schema = array(
-    'section' => 'abaddon_cart',
-    'pattern_id' => 'abaddon_cart',
-    'name' => __('abddon_cart'),
+    'section' => 'abaddoned_carts',
+    'pattern_id' => 'abaddoned_carts',
+    'name' => __('abaddoned_carts'),
     'key' => array('user_id', 'item_id'),
     'order' => 1,
     'table' => 'user_session_products',
     'permissions' => array(
-        'export' => 'view_abaddon_cart',
+        'export' => 'view_abaddoned_carts',
     ),
     'references' => array(
         'users' => array(
@@ -54,7 +54,7 @@ $schema = array(
     ),
     'range_options' => array(
         'selector_url' => 'cart.cart_list',
-        'object_name' => __('abaddon_cart'),
+        'object_name' => __('abaddoned_carts'),
     ),
     'export_fields' => array(
         'User ID' => array(
