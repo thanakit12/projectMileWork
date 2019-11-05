@@ -15,6 +15,7 @@ if ($mode == "export_range") {
         Tygh::$app['session']['export_ranges']['abandoned_carts']['data'] = array('user_id' => $_REQUEST['user_ids']);
         unset($_REQUEST['redirect_url']);
 
-        return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section='abandoned_carts&pattern_id=' . Tygh::$app['session']['export_ranges']['abandoned_carts']['pattern_id']);
+        return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section=abandoned_carts&pattern_id=' . Tygh::$app['session']['export_ranges']['abandoned_carts']['pattern_id']);
     }
 }
+
