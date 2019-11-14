@@ -5,9 +5,7 @@ require_once "content/Product.php";
 require_once "content/php/vendor/autoload.php";
 
 
-use Tygh\Api;
 use Tygh\Registry;
-use Tygh\Api\Request;
 
 if (!defined('AREA')) {
     die('Access denied');
