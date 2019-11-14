@@ -4,6 +4,7 @@ require_once "content/BaseSample.php";
 require_once "content/Product.php";
 require_once "content/php/vendor/autoload.php";
 
+
 use Tygh\Api;
 use Tygh\Registry;
 use Tygh\Api\Request;
@@ -11,64 +12,6 @@ use Tygh\Api\Request;
 if (!defined('AREA')) {
     die('Access denied');
 }
-
-function fn_google_merchant_update_product_post($product_data, $product_id, $lang_code, $create)
-{
-    $isset_image = fn_google_merchant_fetch_images_url($product_id);
-    $status = db_get_row("select status from ?:products where product_id = ?i", $product_id);
-    $product_status = $status["status"];
-    //if create and have image send it to google merchant
-    if ($isset_image != '') {
-        if ($create) {
-            $product = fn_google_merchant_create($product_id, $product_data);
-            fn_google_merchant_insert($product);
-        } else {
-            //  if check has one product and edit some thing then save in products.update page
-            if (isset($_REQUEST['product_id']) && !isset($_REQUEST['product_ids'])) {
-                //A - Active
-                //D - Disable
-                if ($product_status == 'A') {
-                    $product = fn_google_merchant_create($product_id, $product_data);
-                    if ($product != null) {
-                        fn_google_merchant_insert($product);
-                    }
-                } elseif ($product_status == 'D') {
-                    $result = fn_google_merchant_getProductFromMerchant($product_id);
-                    if ($result != false) {
-                        fn_google_merchant_delete($product_id);
-                    }
-                }
-            } // if have api request
-            elseif (Tygh::$app['api'] instanceof Api) {
-                $request = new Request();
-                $method = $request->getMethod();
-                if ($method == 'PUT') {
-                    if ($product_status == 'A') {
-                        $data = fn_get_product_data($product_id, $_SESSION['auth']);
-                        $product = fn_google_merchant_create($product_id, $data);
-                        if ($product != null) {
-                            fn_google_merchant_insert($product);
-                        }
-                    } elseif ($product_status == 'D') {
-                        $check_product = fn_google_merchant_getProductFromMerchant($product_id);
-                        if ($check_product != false) {
-                            fn_google_merchant_delete($product_id);
-                        }
-                    }
-                }
-            } // else one product click change status in products.manage then pass parameter to functions
-            else {
-                if (isset($_REQUEST['id'])) {
-                    $params['id'] = $_REQUEST['id'];
-                    $params['status'] = $product_status;
-                    fn_google_merchant_tools_change_status($params, true);
-                }
-            }
-        }
-
-    }
-}
-
 //This Function is cut html elements
 function fn_rip_tags($string)
 {
@@ -102,23 +45,6 @@ function fn_google_merchant_fetch_images_url($product_id)
         return false;
 }
 
-function fn_google_merchant_insert(Google_Service_ShoppingContent_Product $product)
-{
-    $product_data = new Product();
-    $product_data->session->service->products->insert($product_data->session->merchantId, $product);
-}
-
-function fn_google_merchant_update(Google_Service_ShoppingContent_Product $product)
-{
-    $product_data = new Product();
-    $product_data->session->service->products->insert($product_data->session->merchantId, $product);
-}
-
-function fn_google_merchant_delete($product_id)
-{
-    $product = new Product();
-    $product->deleteProduct($product_id);
-}
 
 function fn_google_merchant_insertBatch($products)
 {
@@ -142,101 +68,16 @@ function fn_google_merchant_insertBatch($products)
 
 }
 
-function fn_google_merchant_import_post($pattern, $import_data, $options)
-{
-    $collect_data = fn_google_merchant_collect_data($import_data);
-    $data_product = fn_google_merchant_prepare_product($collect_data);
-    $result = [];
-    // check product has imagelink
-    for ($i = 0; $i < count($data_product); $i++) {
-        if ($data_product[$i] == null) {
-            continue;
-        } // check field_mapping has selected price
-        else {
-            if ($data_product[$i]->getPrice()->getvalue() == null) {
-                continue;
-            } else {
-                $result[] = $data_product[$i];
-            }
-        }
-    }
-    if (!empty($result)) {
-        fn_google_merchant_insertBatch($result);
-    }
-}
-
-function fn_google_merchant_collect_data($import_data)
-{
-    $arr = [];
-    for ($i = 0; $i < count($import_data); $i++) {
-        $arr[] = $import_data[$i]["th"];
-    }
-    return $arr;
-}
-
-function fn_google_merchant_prepare_product($collect_data)
-{
-    $products = [];
-    $result = [];
-    for ($i = 0; $i < count($collect_data); $i++) {
-        $product_id[] = $collect_data[$i]["product_code"];
-        $company_id[] = $collect_data[$i]["company"]; //Vendor
-        $query = db_get_row("SELECT product_id,company_id FROM ?:products WHERE ?:products.product_code IN('$product_id[$i]')
-                            and (SELECT company_id FROM cscart_companies WHERE company IN('$company_id[$i]'))");
-        $product["product_url"] = fn_google_merchant_fetch_product_url($query["product_id"]);
-        $product["full_description"] = $collect_data[$i]["full_description"];
-        $product["price"] = $collect_data[$i]["price"];
-        $product["product"] = $collect_data[$i]["product"];
-        $product["status"] = isset($collect_data[$i]["status"]) ? $collect_data[$i]["status"] : fn_google_merchant_getStatus($query['product_id']);
-//check product status if status Active push to google merchant if status disable delete from google merchant
-        if ($product["status"] == 'A') {
-            $create_product = fn_google_merchant_create($query["product_id"], $product);
-            $products[] = $create_product;
-        } elseif ($product["status"] == 'D') {
-            $collect_Id = $query["product_id"];
-            $chk_product = fn_google_merchant_getProductFromMerchant($collect_Id);
-            if ($chk_product != false) {
-                $result[] = $collect_Id;
-            }
-        }
-    }
-    if (!empty($result)) {
-        fn_google_merchant_DeleteProductBatch($result);
-    }
-
-    return $products;
-}
-
-//Hook
-
-function fn_google_merchant_tools_change_status($params, $result)
-{
-    $auth = $_SESSION["auth"];
-
-    //This section is insert or delete one product to google merchant when click tool.updates_status on products.manage page
-    if (isset($params['dispatch'])) {
-        try {
-            $product_id = $_REQUEST['id'];
-            $status = $_REQUEST['status'];
-            if ($status == 'A') {
-                $data = fn_get_product_data($product_id, $auth, 'th', '', true, true, true, true, false, false, '');
-                $product = fn_google_merchant_create($product_id, $data);
-                if ($product != null) {
-                    fn_google_merchant_insert($product);
-                }
-            } elseif ($status == 'D') {
-                fn_google_merchant_delete($product_id);
-            }
-        } catch (Exception $e) {
-            fn_set_notification('E', __('error'), _('This product does not in google merchant center'));
-        }
-    }
-}
 
 function fn_google_merchant_create($product_id, $product_data)
 {
     $product = new Google_Service_ShoppingContent_Product();
     $product_name = $product_data["product"];
+    if (isset($product_data['product_code'])) {
+        $product_code = $product_data['product_code'];
+    } else {
+        $product_code = '';
+    }
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
     $brand = fn_google_merchant_GetBrand($product_id);
@@ -270,7 +111,7 @@ function fn_google_merchant_create($product_id, $product_data)
         $product->setAvailability('in stock');
         $product->setImageLink($isset_image);
         $product->setGtin('');
-        $product->setMpn('');
+        $product->setMpn($product_code);
         $product->setBrand($brand);
         $product->setContentLanguage('TH');
         $product->setTargetCountry('TH');
@@ -325,30 +166,39 @@ function fn_google_merchant_DeleteProductBatch($products)
     $product->session->service->products->custombatch($batchRequest);
 }
 
-function fn_google_merchant_checkEmpty($data)
-{
-    $result = [];
-    foreach ($data as $key => $val) {
-        if ($val == '')
+
+
+
+function fn_google_merchant_cron_job($start_of_day,$end_of_day){
+
+    $sql_db = db_get_array("SELECT product_id FROM `?:products`
+                            WHERE updated_timestamp BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)",$start_of_day,$end_of_day);
+
+    $product_merchant = [];
+    $delete_product = [];
+    foreach ($sql_db as $key => $value){
+        $product_id = $value['product_id'];
+        $product_status = fn_google_merchant_getStatus($product_id);
+        if($product_status == 'A') {
+            $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
+            $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
+            $product_merchant[] = $create_product_merchant;
+        }
+        elseif ($product_status == 'D'){
+            $delete_product[] = $product_id;
+        }
+    }
+    $filler_product_merchant = [];
+    for ($i = 0; $i < count($product_merchant); $i++) {
+        if ($product_merchant[$i] == null) {
             continue;
-        else {
-            $result[] = $val;
+        }
+        else{
+            $filler_product_merchant[] = $product_merchant[$i];
         }
     }
-    return $result;
-}
-
-function fn_google_merchant_getProductFromMerchant($offer_id)
-{
-    $product = new Product();
-    try {
-        $productId = $product->buildProductId($offer_id);
-        $product = $product->session->service->products->get($product->session->merchantId, $productId);
-    } catch (Exception $e) {
-        if ($e->getCode() == '404') {
-            $product = false;
-        }
+    fn_google_merchant_insertBatch($filler_product_merchant);
+    if(count($delete_product) > 0){
+        fn_google_merchant_DeleteProductBatch($delete_product);
     }
-
-    return $product;
 }
