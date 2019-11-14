@@ -165,38 +165,38 @@ function fn_google_merchant_DeleteProductBatch($products)
 }
 
 
-
-
-function fn_google_merchant_cron_job($start_of_day,$end_of_day){
+function fn_google_merchant_cron_job($start_of_day, $end_of_day)
+{
 
     $sql_db = db_get_array("SELECT product_id FROM `?:products`
-                            WHERE updated_timestamp BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)",$start_of_day,$end_of_day);
+                            WHERE updated_timestamp BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)", $start_of_day, $end_of_day);
 
-    $product_merchant = [];
-    $delete_product = [];
-    foreach ($sql_db as $key => $value){
-        $product_id = $value['product_id'];
-        $product_status = fn_google_merchant_getStatus($product_id);
-        if($product_status == 'A') {
-            $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
-            $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
-            $product_merchant[] = $create_product_merchant;
+    $check_script = Registry::get('addons.google_merchant.check_script');
+    if ($check_script == 'Y') {
+        $product_merchant = [];
+        $delete_product = [];
+        foreach ($sql_db as $key => $value) {
+            $product_id = $value['product_id'];
+            $product_status = fn_google_merchant_getStatus($product_id);
+            if ($product_status == 'A') {
+                $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
+                $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
+                $product_merchant[] = $create_product_merchant;
+            } elseif ($product_status == 'D') {
+                $delete_product[] = $product_id;
+            }
         }
-        elseif ($product_status == 'D'){
-            $delete_product[] = $product_id;
+        $filler_product_merchant = [];
+        for ($i = 0; $i < count($product_merchant); $i++) {
+            if ($product_merchant[$i] == null) {
+                continue;
+            } else {
+                $filler_product_merchant[] = $product_merchant[$i];
+            }
         }
-    }
-    $filler_product_merchant = [];
-    for ($i = 0; $i < count($product_merchant); $i++) {
-        if ($product_merchant[$i] == null) {
-            continue;
+        fn_google_merchant_insertBatch($filler_product_merchant);
+        if (count($delete_product) > 0) {
+            fn_google_merchant_DeleteProductBatch($delete_product);
         }
-        else{
-            $filler_product_merchant[] = $product_merchant[$i];
-        }
-    }
-    fn_google_merchant_insertBatch($filler_product_merchant);
-    if(count($delete_product) > 0){
-        fn_google_merchant_DeleteProductBatch($delete_product);
     }
 }

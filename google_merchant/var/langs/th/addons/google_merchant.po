@@ -12,6 +12,10 @@ msgctxt "SettingsSections::google_merchant::general"
 msgid "การตั้งค่า"
 msgstr "การตั้งค่า"
 
+msgctxt "SettingsSections::google_merchant::general_script"
+msgid "การตั้งค่า script"
+msgstr "การตั้งค่า script"
+
 msgctxt "SettingsSections::google_merchant::setting_brand"
 msgid "Set การตั้งค่า ยี่ห้อ หรือ รุ่นรถ เป็นข้อมูลของ ฟิลด์ brand ที่ยิงขึ้น merchant center"
 msgstr "Set การตั้งค่า ยี่ห้อ หรือ รุ่นรถ เป็นข้อมูลของ ฟิลด์ brand ที่ยิงขึ้น merchant center"
@@ -19,6 +23,10 @@ msgstr "Set การตั้งค่า ยี่ห้อ หรือ ร�
 msgctxt "SettingsOptions::google_merchant::setting_addon"
 msgid "คู่มือการใช้งาน addon"
 msgstr "คู่มือการใช้งาน addon"
+
+msgctxt "SettingsOptions::google_merchant::check_script"
+msgid "ตั้งค่าการใช้งาน script"
+msgstr "ตั้งค่าการใช้งาน script"
 
 msgctxt "SettingsOptions::google_merchant::brand_value"
 msgid "กำหนดชนิดของฟิลด์ brand ที่ยิงขึ้น google merchant"
