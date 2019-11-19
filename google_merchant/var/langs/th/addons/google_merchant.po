@@ -28,22 +28,19 @@ msgctxt "SettingsOptions::google_merchant::check_script"
 msgid "ตั้งค่าการใช้งาน script"
 msgstr "ตั้งค่าการใช้งาน script"
 
-msgctxt "SettingsOptions::google_merchant::brand_value"
-msgid "กำหนดชนิดของฟิลด์ brand ที่ยิงขึ้น google merchant"
-msgstr "กำหนดชนิดของฟิลด์ brand ที่ยิงขึ้น google merchant"
+msgctxt "SettingsOptions::google_merchant::field_brand_value_main"
+msgid "กำหนดชนิดของฟิลด์ brand ฟิลด์หลักที่ยิงขึ้น google merchant"
+msgstr "กำหนดชนิดของฟิลด์ brand ฟิลด์หลักที่ยิงขึ้น google merchant(ให้ใส่เป็นชื่อ field)"
 
-
-msgctxt "SettingsOptions::google_merchant::checkbox_brand_selected"
-msgid "เลือกช่องฟิลด์ brand ช่องใดช่องหนึ่งที่ใช้ในการยิงขึ้น google_merchant"
-msgstr "เลือกช่องฟิลด์ brand ช่องใดช่องหนึ่งที่ใช้ในการยิงขึ้น google_merchant"
+msgctxt "SettingsOptions::google_merchant::field_brand_value_secondary"
+msgid "กำหนดชนิดของฟิลด์ brand ฟิลด์ที่ 2 ที่ยิงขึ้น google_merchant"
+msgstr "กำหนดชนิดของฟิลด์ brand ฟิลด์ที่ 2 ที่ยิงขึ้น google_merchant(ให้ใส่เป็นชื่อ field)"
 
 msgctxt "SettingsOptions::google_merchant::checkbox_brand_select_all"
 msgid "ยิงฟิลด์ทั้งหมดขึ้น google_merchant"
 msgstr "ยิงฟิลด์ทั้งหมดขึ้น google_merchant"
 
-msgctxt "SettingsOptions::google_merchant::brand_value_second"
-msgid "กำหนดชนิดของฟิลด์ brand ฟิลด์ที่ 2 ที่ยิงขึ้น google_merchant"
-msgstr "กำหนดชนิดของฟิลด์ brand ฟิลด์ที่ 2 ที่ยิงขึ้น google_merchant"
+
 
 
 

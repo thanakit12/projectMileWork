@@ -31,17 +31,13 @@
                     <item id="brand_header">
                         <type>header</type>
                     </item>
-                    <item id="brand_value">
-                        <type>input</type>
-                        <default_value>รุ่นรถ</default_value>
-                    </item>
-                    <item id="brand_value_second">
+                    <item id="field_brand_value_main">
                         <type>input</type>
                         <default_value>ยี่ห้อสินค้า</default_value>
                     </item>
-                    <item id="checkbox_brand_selected">
-                        <type>checkbox</type>
-                        <default_value>N</default_value>
+                    <item id="field_brand_value_secondary">
+                        <type>input</type>
+                        <default_value>รุ่นรถ</default_value>
                     </item>
                     <item id="checkbox_brand_select_all">
                         <type>checkbox</type>

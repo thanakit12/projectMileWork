@@ -61,7 +61,7 @@ function fn_google_merchant_insertBatch($products)
         $batchRequest->setEntries($p);
         $product_data->session->service->products->custombatch($batchRequest);
     } catch (Exception $e) {
-       fn_print_r($e->getMessage());
+        fn_print_r($e->getMessage());
     }
 
 }
@@ -69,6 +69,7 @@ function fn_google_merchant_insertBatch($products)
 
 function fn_google_merchant_create($product_id, $product_data)
 {
+
     $product = new Google_Service_ShoppingContent_Product();
     $product_name = $product_data["product"];
     $part_number = $product_data["part_number"];
@@ -76,21 +77,10 @@ function fn_google_merchant_create($product_id, $product_data)
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
     $brand = fn_google_merchant_GetBrand($product_id);
     $amount = fn_google_merchant_IsExist($product_id);
-
+    $product_description = isset($product_data['full_description']) ? fn_rip_tags($product_data['full_description']) : '';
     //check product has image and has amount
     if ($isset_image != '' && $amount) {
         $product_price = $product_data["price"];
-        //product_description is import but full_description is add each product
-        if (isset($product_data["product_description"])) {
-            $product_description = $product_data["product_description"];
-            $product_description = fn_rip_tags($product_description); //cut html element tags
-        } else {
-            if (!empty($product_description)) {
-                $product_description = $product_data["full_description"];
-                $product_description = fn_rip_tags($product_description); //cut html element tags
-            } else
-                $product_description = '';
-        }
 
         $product->setOfferId($product_id);
         $product->setTitle($product_name);
@@ -111,6 +101,7 @@ function fn_google_merchant_create($product_id, $product_data)
         $product->setTargetCountry('TH');
         $product->setChannel('online');
         $product->setIncludedDestinations(["Shopping Ads"]);
+
         return $product;
     }
 }
@@ -121,68 +112,50 @@ function fn_google_merchant_GetBrand($product_id)
 
     $str = '';
 
-    if (Registry::get('addons.google_merchant.checkbox_brand_selected') == 'Y') {
+    if (Registry::get('addons.google_merchant.checkbox_brand_select_all') == 'Y') {
 
-        if (Registry::get('addons.google_merchant.brand_value') != '' && Registry::get('addons.google_merchant.brand_value_second') == '') {
+        if (Registry::get('addons.google_merchant.field_brand_value_main') != '' && Registry::get('addons.google_merchant.field_brand_value_secondary') != '') {
 
-            $string = Registry::get('addons.google_merchant.brand_value');
-
-            $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
-            $feature_id = $query['feature_id'];
-
-            $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
-
-            if (!empty($query_value['value'])) {
-                $str = strtolower($query_value['value']);
-            } else {
-                $str = '';
-            }
-        } elseif (Registry::get('addons.google_merchant.brand_value') == '' && Registry::get('addons.google_merchant.brand_value_second') != '') {
-
-            $brand = Registry::get('addons.google_merchant.brand_value_second');
-            $query_two = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $brand);
-            $brand_id = $query_two['feature_id'];
-
-            $brand_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $brand_id);
-
-            if (!empty($brand_value['value'])) {
-                $str = strtolower($brand_value['value']);
-            } else {
-                $str = '';
-            }
-        }
-    } elseif (Registry::get('addons.google_merchant.checkbox_brand_select_all') == 'Y') {
-
-        if (Registry::get('addons.google_merchant.brand_value') != '' && Registry::get('addons.google_merchant.brand_value_second') != '') {
-
-            $string = Registry::get('addons.google_merchant.brand_value');
-            $brand = Registry::get('addons.google_merchant.brand_value_second');
+            $string = Registry::get('addons.google_merchant.field_brand_value_main');
+            $brand = Registry::get('addons.google_merchant.field_brand_value_secondary');
 
             $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
             $feature_id = $query['feature_id'];
 
-            $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+            $field_main_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
 
             $query_two = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $brand);
             $brand_id = $query_two['feature_id'];
 
-            $brand_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $brand_id);
+            $field_secondary_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $brand_id);
 
             if (!empty($feature_id) && !empty($brand_id)) {
-                if (empty($brand_value) && empty($query_value)) {
+                if (empty($field_main_value) && empty($field_secondary_value)) {
                     $str = '';
-                } elseif (empty($brand_value) && !empty($query_value)) {
-                    $str = strtolower($query_value['value']);
-                } elseif (!empty($brand_value) && empty($query_value)) {
-                    $str = strtolower($brand_value['value']);
+                } elseif (empty($field_main_value) && !empty($field_secondary_value)) {
+                    $str = strtolower($field_secondary_value['value']);
+                } elseif (!empty($field_brand_value_main) && empty($field_secondary_value)) {
+                    $str = strtolower($field_brand_value_main['value']);
                 } else {
-                    $str = strtolower($brand_value['value']) . "-" . strtolower($query_value['value']);
+                    $str = strtolower($field_main_value['value']) . "-" . strtolower($field_secondary_value['value']);
                 }
             }
         }
+    } else {
+        if (Registry::get('addons.google_merchant.field_brand_value_main') != '') {
 
+            $string = Registry::get('addons.google_merchant.field_brand_value_main');
+
+            $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
+            $feature_id = $query['feature_id'];
+
+            $field_main_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+
+            if (!empty($field_main_value['value'])) {
+                $str = strtolower($field_main_value['value']);
+            }
+        }
     }
-
     return $str;
 }
 

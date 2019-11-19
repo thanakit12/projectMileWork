@@ -11,7 +11,6 @@ date_default_timezone_set("Asia/Bangkok");
 $date = new DateTime();
 
 //SET job at 24:00:00 of next day
-
 $date_begin = date("Y-m-d 00:00:00", strtotime("yesterday"));
 $date_end   = date("Y-m-d 23:59:59", strtotime("yesterday"));
 
