@@ -61,7 +61,7 @@ function fn_google_merchant_insertBatch($products)
         $batchRequest->setEntries($p);
         $product_data->session->service->products->custombatch($batchRequest);
     } catch (Exception $e) {
-        fn_set_notification('E', __('error'), _("Have something error") . ' ' . $e->getMessage());
+       fn_print_r($e->getMessage());
     }
 
 }
@@ -71,11 +71,7 @@ function fn_google_merchant_create($product_id, $product_data)
 {
     $product = new Google_Service_ShoppingContent_Product();
     $product_name = $product_data["product"];
-    if (isset($product_data['product_code'])) {
-        $product_code = $product_data['product_code'];
-    } else {
-        $product_code = '';
-    }
+    $part_number = $product_data["part_number"];
     $product_url = fn_google_merchant_fetch_product_url($product_id);
     $isset_image = fn_google_merchant_fetch_images_url($product_id);
     $brand = fn_google_merchant_GetBrand($product_id);
@@ -109,7 +105,7 @@ function fn_google_merchant_create($product_id, $product_data)
         $product->setAvailability('in stock');
         $product->setImageLink($isset_image);
         $product->setGtin('');
-        $product->setMpn($product_code);
+        $product->setMpn($part_number);
         $product->setBrand($brand);
         $product->setContentLanguage('TH');
         $product->setTargetCountry('TH');
@@ -121,12 +117,73 @@ function fn_google_merchant_create($product_id, $product_data)
 
 function fn_google_merchant_GetBrand($product_id)
 {
-    $string = Registry::get('addons.google_merchant.brand_value');
-    $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
-    $feature_id = $query['feature_id'];
-    $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+    //If you want to change brand you can change in this function
 
-    return !empty($query_value) ? $query_value["value"] : '';
+    $str = '';
+
+    if (Registry::get('addons.google_merchant.checkbox_brand_selected') == 'Y') {
+
+        if (Registry::get('addons.google_merchant.brand_value') != '' && Registry::get('addons.google_merchant.brand_value_second') == '') {
+
+            $string = Registry::get('addons.google_merchant.brand_value');
+
+            $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
+            $feature_id = $query['feature_id'];
+
+            $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+
+            if (!empty($query_value['value'])) {
+                $str = strtolower($query_value['value']);
+            } else {
+                $str = '';
+            }
+        } elseif (Registry::get('addons.google_merchant.brand_value') == '' && Registry::get('addons.google_merchant.brand_value_second') != '') {
+
+            $brand = Registry::get('addons.google_merchant.brand_value_second');
+            $query_two = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $brand);
+            $brand_id = $query_two['feature_id'];
+
+            $brand_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $brand_id);
+
+            if (!empty($brand_value['value'])) {
+                $str = strtolower($brand_value['value']);
+            } else {
+                $str = '';
+            }
+        }
+    } elseif (Registry::get('addons.google_merchant.checkbox_brand_select_all') == 'Y') {
+
+        if (Registry::get('addons.google_merchant.brand_value') != '' && Registry::get('addons.google_merchant.brand_value_second') != '') {
+
+            $string = Registry::get('addons.google_merchant.brand_value');
+            $brand = Registry::get('addons.google_merchant.brand_value_second');
+
+            $query = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $string);
+            $feature_id = $query['feature_id'];
+
+            $query_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $feature_id);
+
+            $query_two = db_get_row("SELECT feature_id FROM ?:product_features_descriptions where description = ?s AND lang_code = 'th'", $brand);
+            $brand_id = $query_two['feature_id'];
+
+            $brand_value = db_get_row("SELECT value FROM ?:product_features_values WHERE product_id = ?i and feature_id = ?i", $product_id, $brand_id);
+
+            if (!empty($feature_id) && !empty($brand_id)) {
+                if (empty($brand_value) && empty($query_value)) {
+                    $str = '';
+                } elseif (empty($brand_value) && !empty($query_value)) {
+                    $str = strtolower($query_value['value']);
+                } elseif (!empty($brand_value) && empty($query_value)) {
+                    $str = strtolower($brand_value['value']);
+                } else {
+                    $str = strtolower($brand_value['value']) . "-" . strtolower($query_value['value']);
+                }
+            }
+        }
+
+    }
+
+    return $str;
 }
 
 function fn_google_merchant_IsExist($product_id)
@@ -151,52 +208,72 @@ function fn_google_merchant_DeleteProductBatch($products)
 {
     $p = [];
     $product = new Product();
-    foreach ($products as $key => $offerId) {
-        $entry = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
-        $entry->setMethod('delete');
-        $entry->setBatchId($key);
-        $entry->setProductId($product->buildProductId($offerId));
-        $entry->setMerchantId($product->session->merchantId);
-        $p[] = $entry;
+    try {
+        foreach ($products as $key => $offerId) {
+            $entry = new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
+            $entry->setMethod('delete');
+            $entry->setBatchId($key);
+            $entry->setProductId($product->buildProductId($offerId));
+            $entry->setMerchantId($product->session->merchantId);
+            $p[] = $entry;
+        }
+        $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
+        $batchRequest->setEntries($p);
+        $product->session->service->products->custombatch($batchRequest);
+    } catch (Exception $e) {
+        fn_print_r($e->getMessage());
     }
-    $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-    $batchRequest->setEntries($p);
-    $product->session->service->products->custombatch($batchRequest);
 }
 
 
 function fn_google_merchant_cron_job($start_of_day, $end_of_day)
 {
+    if (Registry::get('addons.google_merchant.check_script') == 'Y') {
+        $time = new DateTime();
+        $time = date("Y-m-d H:i:s");
+        $array = array(
+            "start_time" => $time,
+        );
+        try {
+            db_query("INSERT INTO ?:log_google_merchant ?e", $array);
+            $sql_db = db_get_array("SELECT product_id FROM `?:products`
+                                    WHERE updated_timestamp
+                                    BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)", $start_of_day, $end_of_day);
 
-    $sql_db = db_get_array("SELECT product_id FROM `?:products`
-                            WHERE updated_timestamp BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)", $start_of_day, $end_of_day);
-
-    $check_script = Registry::get('addons.google_merchant.check_script');
-    if ($check_script == 'Y') {
-        $product_merchant = [];
-        $delete_product = [];
-        foreach ($sql_db as $key => $value) {
-            $product_id = $value['product_id'];
-            $product_status = fn_google_merchant_getStatus($product_id);
-            if ($product_status == 'A') {
-                $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
-                $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
-                $product_merchant[] = $create_product_merchant;
-            } elseif ($product_status == 'D') {
-                $delete_product[] = $product_id;
+            $product_merchant = [];
+            $delete_product = [];
+            foreach ($sql_db as $key => $value) {
+                $product_id = $value['product_id'];
+                $product_status = fn_google_merchant_getStatus($product_id);
+                if ($product_status == 'A') {
+                    $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
+                    $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
+                    $product_merchant[] = $create_product_merchant;
+                } elseif ($product_status == 'D') {
+                    $delete_product[] = $product_id;
+                }
             }
-        }
-        $filler_product_merchant = [];
-        for ($i = 0; $i < count($product_merchant); $i++) {
-            if ($product_merchant[$i] == null) {
-                continue;
-            } else {
-                $filler_product_merchant[] = $product_merchant[$i];
+            $filler_product_merchant = [];
+            for ($i = 0; $i < count($product_merchant); $i++) {
+                if ($product_merchant[$i] == null) {
+                    continue;
+                } else {
+                    $filler_product_merchant[] = $product_merchant[$i];
+                }
             }
-        }
-        fn_google_merchant_insertBatch($filler_product_merchant);
-        if (count($delete_product) > 0) {
-            fn_google_merchant_DeleteProductBatch($delete_product);
+            fn_google_merchant_insertBatch($filler_product_merchant);
+            if (count($delete_product) > 0) {
+                fn_google_merchant_DeleteProductBatch($delete_product);
+            }
+            try {
+                $finish_time = date('Y-m-d H:i:s');
+                db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", $finish_time, count($filler_product_merchant), count($delete_product), $time);
+            } catch (Exception $exception) {
+                db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", $finish_time, $exception->getMessage(), $time);
+            }
+        } catch (Exception $exception) {
+            db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", $finish_time, $exception->getMessage(), $time);
         }
     }
 }
+

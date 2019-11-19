@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
     <id>google_merchant</id>
-    <version>1.1.7</version>
+    <version>1.1.8</version>
     <priority>100500</priority>
     <status>active</status>
     <settings>
@@ -35,10 +35,38 @@
                         <type>input</type>
                         <default_value>รุ่นรถ</default_value>
                     </item>
+                    <item id="brand_value_second">
+                        <type>input</type>
+                        <default_value>ยี่ห้อสินค้า</default_value>
+                    </item>
+                    <item id="checkbox_brand_selected">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="checkbox_brand_select_all">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
                 </items>
             </section>
         </sections>
     </settings>
+    <queries>
+        <item for="install">
+            CREATE TABLE IF NOT EXISTS `?:log_google_merchant` (
+            `log_id` mediumint(8) NOT NULL AUTO_INCREMENT,
+            `start_time` DATETIME NOT NULL,
+            `finish_time` DATETIME NOT NULL,
+            `error` mediumtext NOT NULL DEFAULT 'N',
+            `amount_product_insert` int(11) NOT NULL DEFAULT 0,
+            `amount_product_deleted` int(11) NOT NULL DEFAULT 0,
+            PRIMARY KEY (`log_id`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">
+            DROP TABLE IF EXISTS `?:log_google_merchant`
+        </item>
+    </queries>
     <supplier>Thanakit</supplier>
     <authors>
         <author>
