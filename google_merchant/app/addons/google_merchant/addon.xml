@@ -50,10 +50,10 @@
     <queries>
         <item for="install">
             CREATE TABLE IF NOT EXISTS `?:log_google_merchant` (
-            `log_id` mediumint(8) NOT NULL AUTO_INCREMENT,
+            `log_id` int(11) NOT NULL AUTO_INCREMENT,
             `start_time` DATETIME NOT NULL,
             `finish_time` DATETIME NOT NULL,
-            `error` mediumtext NOT NULL DEFAULT 'N',
+            `error` varchar(255) NOT NULL DEFAULT 'N',
             `amount_product_insert` int(11) NOT NULL DEFAULT 0,
             `amount_product_deleted` int(11) NOT NULL DEFAULT 0,
             PRIMARY KEY (`log_id`)
