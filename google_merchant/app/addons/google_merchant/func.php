@@ -202,51 +202,51 @@ function fn_google_merchant_DeleteProductBatch($products)
 function fn_google_merchant_cron_job($start_of_day, $end_of_day)
 {
     if (Registry::get('addons.google_merchant.check_script') == 'Y') {
-        $time = new DateTime();
         $time = date("Y-m-d H:i:s");
         $array = array(
             "start_time" => $time,
         );
         try {
+            $sum_product_insert = 0;
+            $sum_product_delete = 0;
             db_query("INSERT INTO ?:log_google_merchant ?e", $array);
             $sql_db = db_get_array("SELECT product_id FROM `?:products`
                                     WHERE updated_timestamp
                                     BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)", $start_of_day, $end_of_day);
 
-            $product_merchant = [];
-            $delete_product = [];
-            foreach ($sql_db as $key => $value) {
-                $product_id = $value['product_id'];
-                $product_status = fn_google_merchant_getStatus($product_id);
-                if ($product_status == 'A') {
-                    $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
-                    $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
-                    $product_merchant[] = $create_product_merchant;
-                } elseif ($product_status == 'D') {
-                    $delete_product[] = $product_id;
+            // Partition data in Array
+            $partition_data = array_chunk($sql_db, 1000);
+            for ($i = 0; $i < count($partition_data); $i++) {
+                $product_merchant = []; // Reset Array
+                $delete_product = []; // Reset Array
+                for ($j = 0; $j < count($partition_data[$i]); $j++) {
+                    $product_id = $partition_data[$i][$j]['product_id'];
+                    $product_status = fn_google_merchant_getStatus($product_id);
+                    if ($product_status == 'A') {
+                        $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
+                        $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
+                        $product_merchant[] = $create_product_merchant;
+                    } elseif ($product_status == 'D') {
+                        $delete_product[] = $product_id;
+                    }
                 }
-            }
-            $filler_product_merchant = [];
-            for ($i = 0; $i < count($product_merchant); $i++) {
-                if ($product_merchant[$i] == null) {
-                    continue;
-                } else {
-                    $filler_product_merchant[] = $product_merchant[$i];
+                $fillter_array = array_filter($product_merchant);
+                fn_google_merchant_insertBatch($fillter_array);
+                if (count($delete_product) > 0) {
+                    fn_google_merchant_DeleteProductBatch($delete_product);
                 }
-            }
-            fn_google_merchant_insertBatch($filler_product_merchant);
-            if (count($delete_product) > 0) {
-                fn_google_merchant_DeleteProductBatch($delete_product);
+                $sum_product_insert += count($fillter_array);
+                $sum_product_delete += count($delete_product);
             }
             try {
-                $finish_time = date('Y-m-d H:i:s');
-                db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", $finish_time, count($filler_product_merchant), count($delete_product), $time);
+                db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", date('Y-m-d H:i:s'), $sum_product_insert, $sum_product_delete, $time);
             } catch (Exception $exception) {
-                db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", $finish_time, $exception->getMessage(), $time);
+                db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", date('Y-m-d H:i:s'), $exception->getMessage(), $time);
+                fn_print_r($exception->getMessage());
             }
         } catch (Exception $exception) {
-            db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", $finish_time, $exception->getMessage(), $time);
+            db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", date('Y-m-d H:i:s'), $exception->getMessage(), $time);
+            fn_print_r($exception->getMessage());
         }
     }
 }
-
