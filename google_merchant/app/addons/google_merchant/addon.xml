@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
     <id>google_merchant</id>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
     <priority>100500</priority>
     <status>active</status>
     <settings>
@@ -53,7 +53,6 @@
             `log_id` int(11) NOT NULL AUTO_INCREMENT,
             `start_time` DATETIME NOT NULL,
             `finish_time` DATETIME NOT NULL,
-            `error` varchar(255) NOT NULL DEFAULT 'N',
             `amount_product_insert` int(11) NOT NULL DEFAULT 0,
             `amount_product_deleted` int(11) NOT NULL DEFAULT 0,
             PRIMARY KEY (`log_id`)

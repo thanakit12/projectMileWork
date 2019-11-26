@@ -61,7 +61,7 @@ function fn_google_merchant_insertBatch($products)
         $batchRequest->setEntries($p);
         $product_data->session->service->products->custombatch($batchRequest);
     } catch (Exception $e) {
-        fn_print_r($e->getMessage());
+        error_log($e->getMessage());
     }
 
 }
@@ -194,7 +194,7 @@ function fn_google_merchant_DeleteProductBatch($products)
         $batchRequest->setEntries($p);
         $product->session->service->products->custombatch($batchRequest);
     } catch (Exception $e) {
-        fn_print_r($e->getMessage());
+        error_log($e->getMessage());
     }
 }
 
@@ -238,15 +238,9 @@ function fn_google_merchant_cron_job($start_of_day, $end_of_day)
                 $sum_product_insert += count($fillter_array);
                 $sum_product_delete += count($delete_product);
             }
-            try {
-                db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", date('Y-m-d H:i:s'), $sum_product_insert, $sum_product_delete, $time);
-            } catch (Exception $exception) {
-                db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", date('Y-m-d H:i:s'), $exception->getMessage(), $time);
-                fn_print_r($exception->getMessage());
-            }
+            db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", date('Y-m-d H:i:s'), $sum_product_insert, $sum_product_delete, $time);
         } catch (Exception $exception) {
-            db_query("UPDATE ?:log_google_merchant SET  finish_time = ?s,error = ?s WHERE start_time = ?s", date('Y-m-d H:i:s'), $exception->getMessage(), $time);
-            fn_print_r($exception->getMessage());
+            error_log($exception->getMessage());
         }
     }
 }
