@@ -63,7 +63,6 @@ function fn_google_merchant_insertBatch($products)
     } catch (Exception $e) {
         error_log($e->getMessage());
     }
-
 }
 
 
@@ -209,11 +208,13 @@ function fn_google_merchant_cron_job($start_of_day, $end_of_day)
         try {
             $sum_product_insert = 0;
             $sum_product_delete = 0;
+            $process_skip = 0;
             db_query("INSERT INTO ?:log_google_merchant ?e", $array);
             $sql_db = db_get_array("SELECT product_id FROM `?:products`
                                     WHERE updated_timestamp
                                     BETWEEN UNIX_TIMESTAMP(?s) AND UNIX_TIMESTAMP(?s)", $start_of_day, $end_of_day);
 
+            db_query("UPDATE ?:log_google_merchant SET Total = ?i WHERE start_time = ?s", count($sql_db), $time);
             // Partition data in Array
             $partition_data = array_chunk($sql_db, 1000);
             for ($i = 0; $i < count($partition_data); $i++) {
@@ -225,7 +226,11 @@ function fn_google_merchant_cron_job($start_of_day, $end_of_day)
                     if ($product_status == 'A') {
                         $data_product = fn_get_product_data($product_id, $_SESSION['auth']);
                         $create_product_merchant = fn_google_merchant_create($product_id, $data_product);
-                        $product_merchant[] = $create_product_merchant;
+                        if ($create_product_merchant == null) {
+                            $process_skip++;
+                        } else {
+                            $product_merchant[] = $create_product_merchant;
+                        }
                     } elseif ($product_status == 'D') {
                         $delete_product[] = $product_id;
                     }
@@ -237,8 +242,8 @@ function fn_google_merchant_cron_job($start_of_day, $end_of_day)
                 }
                 $sum_product_insert += count($fillter_array);
                 $sum_product_delete += count($delete_product);
+                db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,Process_insert = ?i,Process_deleted = ?i,Process_Skip = ?i  WHERE start_time = ?s", date('Y-m-d H:i:s'), $sum_product_insert, $sum_product_delete, $process_skip, $time);
             }
-            db_query("UPDATE ?:log_google_merchant SET finish_time = ?s,amount_product_insert = ?i,amount_product_deleted = ?i  WHERE start_time = ?s", date('Y-m-d H:i:s'), $sum_product_insert, $sum_product_delete, $time);
         } catch (Exception $exception) {
             error_log($exception->getMessage());
         }

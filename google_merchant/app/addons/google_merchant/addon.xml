@@ -53,8 +53,10 @@
             `log_id` int(11) NOT NULL AUTO_INCREMENT,
             `start_time` DATETIME NOT NULL,
             `finish_time` DATETIME NOT NULL,
-            `amount_product_insert` int(11) NOT NULL DEFAULT 0,
-            `amount_product_deleted` int(11) NOT NULL DEFAULT 0,
+            `Total` int(11) NOT NULL DEFAULT 0,
+            `Process_Skip` int(11) NOT NULL DEFAULT 0,
+            `Process_insert` int(11) NOT NULL DEFAULT 0,
+            `Process_deleted` int(11) NOT NULL DEFAULT 0,
             PRIMARY KEY (`log_id`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>

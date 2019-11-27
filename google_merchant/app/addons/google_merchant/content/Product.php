@@ -48,68 +48,11 @@ class Product extends BaseSample
         $this->session->service->products->delete($this->session->merchantId, $productId);
     }
 
-    private function buildProductId($offer_id)
+    public function buildProductId($offer_id)
     {
         return sprintf('%s:%s:%s:%s', self::CHANNEL, self::CONTENT_LANGUAGE,
             self::TARGET_COUNTRY, $offer_id);
     }
 
-    public function createProduct($product_id, $product_data)
-    {
-        $product = new Google_Service_ShoppingContent_Product();
-        $product_url = fn_google_merchant_fetch_product_url($product_id);
-        $isset_image = fn_google_merchant_fetch_images_url($product_id);
-
-        $product_name = $product_data["product"];
-        $product_price = $product_data["price"];
-
-        if (isset($product["brand"]))
-            $brand = $product_data["brand"];
-        else
-            $brand = 'test';
-
-        $product_description = $product_data["full_description"];
-        $product_description = fn_rip_tags($product_description); //cut html element tags
-
-        $product->setOfferId($product_id);
-        $product->setTitle($product_name);
-        $product->setDescription($product_description);
-        $product->setLink($product_url);
-        $product->setCondition('New');
-
-        $price = new Google_Service_ShoppingContent_Price();
-        $price->setValue($product_price);
-        $price->setCurrency('THB');
-
-        $product->setPrice($price);
-        $product->setAvailability('in stock');
-        $product->setImageLink($isset_image);
-        $product->setGtin('');
-        $product->setMpn('');
-        $product->setBrand($brand);
-        $product->setContentLanguage('TH');
-        $product->setTargetCountry('TH');
-        $product->setChannel('online');
-        $product->setIncludedDestinations(["Shopping Ads"]);
-
-        return $product;
-    }
-
-    public function DeleteBatch($products)
-    {
-        $p = [];
-        foreach ($products as $key => $offerId) {
-            $entry =
-                new Google_Service_ShoppingContent_ProductsCustomBatchRequestEntry();
-            $entry->setMethod('delete');
-            $entry->setBatchId($key);
-            $entry->setProductId($this->buildProductId($offerId));
-            $entry->setMerchantId($this->session->merchantId);
-            $p[] = $entry;
-        }
-        $batchRequest = new Google_Service_ShoppingContent_ProductsCustomBatchRequest();
-        $batchRequest->setEntries($p);
-        $batchResponses = $this->session->service->products->custombatch($batchRequest);
-    }
 }
 
